@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nFucks", "nFucks\nFucks.csproj", "{12AA7E8F-FE76-423D-805F-6913545E3E56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nFucksTest", "nFucksTest\nFucksTest.csproj", "{B7E3E284-BBC8-490A-84B1-91042A1A7D38}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12AA7E8F-FE76-423D-805F-6913545E3E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12AA7E8F-FE76-423D-805F-6913545E3E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12AA7E8F-FE76-423D-805F-6913545E3E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12AA7E8F-FE76-423D-805F-6913545E3E56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7E3E284-BBC8-490A-84B1-91042A1A7D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7E3E284-BBC8-490A-84B1-91042A1A7D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7E3E284-BBC8-490A-84B1-91042A1A7D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7E3E284-BBC8-490A-84B1-91042A1A7D38}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
