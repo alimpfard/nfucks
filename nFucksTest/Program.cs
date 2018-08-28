@@ -24,10 +24,17 @@ namespace nFucksTest
 			surface0.drawBounds();
 			surface1.drawBounds();
 			fucksManager.renderOnce();
-			System.Console.ReadKey();
-			fucksManager.Focus(surface0);
-			fucksManager.renderOnce();
-			// fucksManager.runInternLoop((char c) => fucksManager.PutChar(c, pos));
+			for (int i=0; i<100; i++) 
+            {
+				System.Console.ReadKey();
+                fucksManager.Focus(surface0);
+                fucksManager.renderOnce();
+				System.Console.ReadKey();
+                fucksManager.Focus(surface1);
+                // move the surface around a bit
+				fucksManager.Translate(surface1, (i % 3 - 1), (i % 3 - 1) * -1);
+				fucksManager.renderOnce();
+            }
 		}
     }
 }

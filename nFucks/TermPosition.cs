@@ -1,4 +1,6 @@
-﻿namespace nFucks
+﻿using System;
+
+namespace nFucks
 {
 	public struct TermPosition
 	{
@@ -29,6 +31,11 @@
 				if (Y >= bounds.Y) Y -= bounds.Y;
 			}
 		}
+        public void Translate(int x, int y)
+        {
+            X += x;
+            Y += y;
+        }
 		public void Set(int x, int y)
 		{
 			X = x;
@@ -38,6 +45,10 @@
 		{
 			return new TermPosition(p0.X + p1.X, p0.Y + p1.Y);
 		}
+		public static TermPosition operator -(TermPosition p0, TermPosition p1)
+        {
+            return new TermPosition(p0.X - p1.X, p0.Y - p1.Y);
+        }
 		public static TermPosition operator +(TermPosition p0, TermSize p1)
         {
             return new TermPosition(p0.X + p1.X, p0.Y + p1.Y);
@@ -52,9 +63,32 @@
 			Y *= ys;
 			return this;
 		}
+		public int Size
+		{
+			get
+			{
+				return (int)(System.Math.Sqrt(System.Math.Pow(X, 2) + System.Math.Pow(Y, 2)) + 0.5); // Fix thou rounding errors
+			}
+		}
 		public override string ToString()
 		{
 			return string.Format("<{0}, {1}>", X, Y);
 		}
+
+		internal void ScaledDown(int xscale, int yscale)
+		{
+			X /= xscale;
+			Y /= yscale;
+		}
+
+		internal TermPosition CompoundMaxmimumBound(TermPosition positionDelta)
+		{
+			return new TermPosition(Math.Min(X, X - positionDelta.X), Math.Min(Y, Y - positionDelta.Y));
+		}
+
+		internal TermPosition CompoundMaxmimumBound(TermSize positionAddition)
+        {
+			return new TermPosition(Math.Max(X, X + positionAddition.X), Math.Max(Y, Y + positionAddition.Y));
+        }
 	}
 }
