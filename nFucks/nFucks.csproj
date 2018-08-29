@@ -43,6 +43,9 @@
     <Compile Include="FucksManager.cs" />
     <Compile Include="TermSize.cs" />
     <Compile Include="ListExtensions.cs" />
+    <Compile Include="RenderState.cs" />
+    <Compile Include="GlobalTermState.cs" />
+    <Compile Include="GlobalTermInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

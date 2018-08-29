@@ -53,6 +53,10 @@ namespace nFucks
         {
             return new TermPosition(p0.X + p1.X, p0.Y + p1.Y);
         }
+		public static TermPosition operator +(TermPosition p0, int p1)
+        {
+            return new TermPosition(p0.X + p1, p0.Y + p1);
+        }
 		public TermPosition ScaleUp(int xs, int ys)
 		{
 			return new TermPosition(xs * X, ys * Y);
@@ -89,6 +93,27 @@ namespace nFucks
 		internal TermPosition CompoundMaxmimumBound(TermSize positionAddition)
         {
 			return new TermPosition(Math.Max(X, X + positionAddition.X), Math.Max(Y, Y + positionAddition.Y));
+        }
+
+		internal void advanceLeft(TermSize bounds)
+		{
+			Y--;
+            if (Y < 0)
+            {
+                X--;
+                Y += bounds.Y;
+                if (X < 0) X += bounds.X;
+            }
+		}
+		internal void advanceUp(TermSize bounds)
+        {
+            X--;
+            if (X < 0)
+            {
+                Y--;
+                X += bounds.X;
+                if (Y < 0) Y += bounds.Y;
+            }
         }
 	}
 }

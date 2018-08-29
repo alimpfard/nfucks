@@ -24,7 +24,7 @@
 		private BasicColor()
 		{
 		}
-		public System.ConsoleColor AsConsoleColor()
+		public System.ConsoleColor? AsConsoleColor()
 		{
 			return consoleColor;
 		}
@@ -33,7 +33,7 @@
 			return new char[] { foreground ? fcolor : bcolor };
 		}
 
-		public System.ConsoleColor ProvideFallback(TermPosition position, bool foreground)
+		public System.ConsoleColor? ProvideFallback(TermPosition position, bool foreground)
 		{
 			return foreground ? System.ConsoleColor.Black : System.ConsoleColor.White;
 		}

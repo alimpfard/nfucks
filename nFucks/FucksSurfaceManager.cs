@@ -1,7 +1,7 @@
 ﻿using System;
 namespace nFucks
 {
-	public class FucksSurfaceManager
+	public partial class FucksSurfaceManager
 	{
 		readonly int MAX_HISTORY = 4;
 		public TermState[] stepBacks;
@@ -227,32 +227,84 @@ namespace nFucks
 			}
 		}
 
-		private void renderCell(ref TermCell cell, ref TermPosition position, int xs, int ys)
+		public void PutVertString(string s, ref TermPosition pos)
+        {
+            int strlen = s.Length;
+            if (strlen == 0) return;
+            int str_idx = 0;
+            int c_x;
+            for (c_x = pos.X; pos.Y < currentState.resolution.Yres; pos.Y++)
+            {
+                for (; pos.X < currentState.resolution.Xres; pos.X++)
+                {
+                    if (str_idx == strlen) { pos.X--; return; }
+                    PutChar(s[str_idx++], pos);
+                }
+                if (str_idx == strlen)
+                {
+                    pos.X--;
+                    return;
+                }
+                pos.X = c_x;
+            }
+        }
+
+		public void PutReverseVertString(string s, ref TermPosition pos)
+        {
+            int strlen = s.Length;
+            if (strlen == 0) return;
+            int str_idx = 0;
+            int c_x;
+            for (c_x = pos.X; pos.Y >= 0; pos.Y--)
+            {
+                for (; pos.X >= 0; pos.X--)
+                {
+                    if (str_idx == strlen) { pos.X++; return; }
+                    PutChar(s[str_idx++], pos);
+                }
+                if (str_idx == strlen)
+                {
+                    pos.X++;
+                    return;
+                }
+                pos.X = c_x;
+            }
+        }
+
+		private bool renderCell(ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false)
 		{
 			cell.dirty = false;
 			ITermColor back = cell.backgroundColor, fore = cell.foregroundColor;
+			ConsoleColor? rf;
 			if (back != null)
-				Console.BackgroundColor = back.AsConsoleColor();
+				rf = back.AsConsoleColor();
 			else
-				Console.BackgroundColor = defaultProvider.ProvideFallback(position);
+                rf = defaultProvider.ProvideFallback(position);
+			if (rf == null && !notrans) return false;
+			Console.BackgroundColor = rf ?? Console.BackgroundColor; // don't touch it
 			if (fore != null)
-				Console.ForegroundColor = fore.AsConsoleColor();
+				rf = fore.AsConsoleColor();
 			else
-				Console.ForegroundColor = defaultProvider.ProvideFallback(position, true);
-			char data = cell.data;
+				rf = defaultProvider.ProvideFallback(position, true);
+			char data = cell.data, space = ' ';
+			if (rf == null && notrans) return false;
+			if (rf == null) space = data = (char)0;
+			Console.ForegroundColor = rf ?? Console.ForegroundColor; // don't touch it
 			TermPosition normalized = (position + surfacePosition).ScaledUp(xs, ys);
 			for (int i = 0; i < xs; i++)
 				for (int j = 0; j < ys; j++)
 				{
 					Console.SetCursorPosition(normalized.Y + j, normalized.X + i);
-					Console.Write(i + j == 0 ? data : ' ');
+					Console.Write(i + j == 0 ? data : space);
 				}
+			return true;
 		}
 
 		/// <summary>
 		/// Renders the surface.
 		/// </summary>
 		/// <param name="runForAll">If set to <c>true</c> will update all cells, regardless of them being marked dirty.</param>
+		[Obsolete("Use a manager to manage several surfaces")]
 		public void renderOnce(bool runForAll = false)
 		{
 			if (!dirty && !runForAll) return;
@@ -285,7 +337,7 @@ namespace nFucks
 
 		public bool LocalInBounds(TermPosition position)
 		{
-			return position.X < bounds.X && position.Y < bounds.Y;
+			return position.X >= 0 && position.X < bounds.X && position.Y >= 0 && position.Y < bounds.Y;
 		}
 
         /// <summary>
@@ -302,15 +354,43 @@ namespace nFucks
 			return LocalInBounds(position);
 		}
 
-		public bool RenderIfInBounds(TermPosition position)
+		public RenderState RenderIfInBounds(TermPosition position)
 		{
 			if (RaytraceLocal(ref position))
 			{
-				renderCell(ref currentState.cells[position.X, position.Y], ref position, currentState.resolution.Xscale, currentState.resolution.Yscale);
-				return true;
+				ref var cell = ref currentState.cells[position.X, position.Y];
+				if (!dirty && !cell.dirty) return RenderState.Skipped;
+				if (!renderCell(ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale)) 
+					return RenderState.IgnoreIfPossible; //it was a "hole"
+				return RenderState.Rendered;
 			}
-			return false;
+			return RenderState.NotInBounds;
 		}
+
+		public RenderState RenderIfInBounds(TermPosition position, bool force)
+        {
+            if (RaytraceLocal(ref position))
+            {
+                ref var cell = ref currentState.cells[position.X, position.Y];
+                if (!force && !dirty && !cell.dirty) return RenderState.Skipped;
+				if (!renderCell(ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale))
+                    return RenderState.IgnoreIfPossible; //it was a "hole"
+                return RenderState.Rendered;
+            }
+            return RenderState.NotInBounds;
+        }
+		public RenderState RenderIfInBounds(TermPosition position, bool force, bool notrans)
+        {
+            if (RaytraceLocal(ref position))
+            {
+                ref var cell = ref currentState.cells[position.X, position.Y];
+                if (!force && !dirty && !cell.dirty) return RenderState.Skipped;
+				if (!renderCell(ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale, notrans))
+                    return RenderState.IgnoreIfPossible; //it was a "hole" 
+                return RenderState.Rendered;
+            }
+            return RenderState.NotInBounds;
+        }
 
 		/// <summary>
 		/// Draws the bounds of the surface.
@@ -319,26 +399,40 @@ namespace nFucks
 		public void drawBounds()
 		{
 			TermSize sz = bounds;//.Scale(currentState.resolution.Xscale, currentState.resolution.Yscale);
-			string hor = new string('-', sz.Y), ver = new string('|', sz.X - 1);
+			string hor = new string('-', sz.Y-1), ver = new string('|', sz.X - 1);
 			TermPosition pos = new TermPosition(0, 0);
+			PutChar('+', ref pos);
 			PutString(hor, ref pos);
+			PutChar('+', ref pos);
+			/* +-----------------+
+            *>.
+            */
+			PutVertString(ver, ref pos);
+			/* +-----------------+
+			 * |
+             * .<
+            */
+			PutChar('+', ref pos);
+			/*  +-----------------+
+             *  |
+            *  +.<
+            */
+			PutString(hor, ref pos);
+			/* +-----------------+
+             *  |
+             * +------------------<
+             */
 			PutChar('+', pos);
-			pos.advanceDown(bounds);
-			PutString(ver, ref pos);
-			PutChar('+', pos);
-			pos = new TermPosition(sz.X - 1, 0);
-			PutString(hor.Substring(1), ref pos);
-		}
-
-		public void runInternLoop(Action<char> onCharRead)
-		{
-			while (true)
-			{
-				renderOnce();
-				if (Console.KeyAvailable)
-					onCharRead(Console.ReadKey().KeyChar);
-				System.Threading.Thread.Sleep(5);
-			}
+			/* +-----------------+
+             *  |
+             * +-----------------+<
+             */
+			pos.advanceUp(sz);
+			PutReverseVertString(ver.Substring(1), ref pos);
+			/* +-----------------+
+             *  |                      | <
+             * +-----------------+
+             */
 		}
 	}
 }

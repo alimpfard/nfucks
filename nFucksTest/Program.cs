@@ -10,9 +10,10 @@ namespace nFucksTest
 		//FucksSurfaceManager fucksManager = new FucksSurfaceManager(res, new TermColorProvider((TermPosition pos, bool fore) => fore ? System.ConsoleColor.DarkBlue : System.ConsoleColor.Red));
         public static void Main(string[] args)
         {
-			var surface0 = fucksManager.CreateAndInitializeSurface(new TermPosition(0, 0), new TermResolution(10, 40));
-			var surface1 = fucksManager.CreateAndInitializeSurface(new TermPosition(4, 6), new TermResolution(14, 42, 1, 2));
-			surface1.defaultProvider = new TermColorProvider((arg1, arg2) => arg2 ? System.ConsoleColor.White : System.ConsoleColor.DarkGreen);
+			var surface0 = fucksManager.CreateAndInitializeSurface(new TermPosition(8, 10), new TermResolution(10, 40));
+			var surface1 = fucksManager.CreateAndInitializeSurface(new TermPosition(0, 0), new TermResolution(10, 40, 1, 2));
+			surface0.defaultProvider = new StaticTermColorProvider(System.ConsoleColor.Black, null); //fore back
+				//new TermColorProvider((arg1, arg2) => arg2 ? System.ConsoleColor.White : System.ConsoleColor.DarkGreen);
 			var pos = new TermPosition(1, 2);
 			surface0.PutString("Hello, World", ref pos);
 			surface0.SetBackColor(pos, BasicColor.Green);
@@ -31,7 +32,7 @@ namespace nFucksTest
                 fucksManager.renderOnce();
 				System.Console.ReadKey();
                 fucksManager.Focus(surface1);
-                // move the surface around a bit
+                // move the surface around a bit            
 				fucksManager.Translate(surface1, (i % 3 - 1), (i % 3 - 1) * -1);
 				fucksManager.renderOnce();
             }

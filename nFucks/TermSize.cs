@@ -10,7 +10,14 @@ namespace nFucks
             X = windowHeight;
             Y = windowWidth;
         }
-
+		public static bool operator ==(TermSize ts0, TermSize ts1)
+		{
+			return ts0.X == ts1.Y && ts0.Y == ts1.Y;
+		}
+		public static bool operator !=(TermSize ts0, TermSize ts1)
+        {
+            return ts0.X == ts1.Y && ts0.Y == ts1.Y;
+        }
         public static TermSize CurrentTermSize => new TermSize(Console.BufferHeight, Console.BufferWidth);
         public TermSize Scaled(int x, int y)
         {
@@ -22,5 +29,20 @@ namespace nFucks
         {
 			return new TermSize(X / x, Y / y);
         }
-    }
+
+		public override bool Equals(object obj)
+		{
+			return obj is TermSize && this == (TermSize) obj;
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return String.Format("<{0}x{1}>", X, Y);
+		}
+	}
 }
