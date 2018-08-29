@@ -36,22 +36,22 @@ namespace nFucksTest
 			// draw a frame for both windows
 			surface0.drawBounds();
 			surface1.drawBounds();
-
+            TermPosition termPosition = new TermPosition(1, 1);
 			// render one iteration
 			fucksManager.renderOnce();
-			for (int i=0; i<100; i++)
+			while(true)
             {
-				System.Console.ReadKey();
-				// focus the first surface and render it
-                fucksManager.Focus(surface0);
+                fucksManager.PutChar(surface0, System.Console.ReadKey().KeyChar, ref termPosition);
+                // focus the first surface and render it
+                //fucksManager.Focus(surface0);
                 fucksManager.renderOnce();
-				System.Console.ReadKey();
+
 
 				// focus the second surface, move it around and render it again
-                fucksManager.Focus(surface1);
+                // fucksManager.Focus(surface1);
                 // move the surface around a bit            
-				fucksManager.Translate(surface1, (i % 3 - 1), (i % 3 - 1) * -1);
-				fucksManager.renderOnce();
+				//fucksManager.Translate(surface1, (i % 3 - 1), (i % 3 - 1) * -1);
+				//fucksManager.renderOnce();
             }
 		}
     }

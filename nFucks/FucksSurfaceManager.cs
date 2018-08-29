@@ -12,6 +12,7 @@ namespace nFucks {
         private TermPosition positionDelta;
 
         public TermPosition PositionDelta { get => positionDelta; private set => positionDelta = value; }
+        public bool Dirty { get => dirty; }
 
         public delegate void RefAction<T1> (ref T1 arg1);
 
@@ -61,8 +62,7 @@ namespace nFucks {
                 for (int y = 0; y < bounds.Y; y++) {
                     ref
                     var cell = ref currentState.cells[x, y];
-                    cell.data = ' ';
-                    cell.dirty = true;
+                    cell.Data = ' ';
                 }
         }
 
@@ -119,12 +119,9 @@ namespace nFucks {
         /// <param name="position">Local (surface-wide) position of the cell.</param>
         public void PutChar (char c, TermPosition position) {
             dirty = true;
-            ref
-            var cells = ref currentState.cells;
-            ref
-            var cell = ref cells[position.X, position.Y];
-            cell.data = c;
-            cell.dirty = true;
+            ref var cells = ref currentState.cells;
+            ref var cell = ref cells[position.X, position.Y];
+            cell.Data = c;
             // currentState.cells[position.X, position.Y] = cell;
         }
 
@@ -135,12 +132,9 @@ namespace nFucks {
         /// <param name="position">(reference) Local (surface-wide) position of the cell.</param>
         public void PutChar (char c, ref TermPosition position) {
             dirty = true;
-            ref
-            var cells = ref currentState.cells;
-            ref
-            var cell = ref cells[position.X, position.Y];
-            cell.data = c;
-            cell.dirty = true;
+            ref var cells = ref currentState.cells;
+            ref var cell = ref cells[position.X, position.Y];
+            cell.Data = c;
             position.advanceRight (bounds);
         }
 
@@ -151,10 +145,8 @@ namespace nFucks {
         /// <param name="back">Color.</param>
         public void SetBackColor (TermPosition position, ITermColor back) {
             dirty = true;
-            ref
-            var cells = ref currentState.cells;
-            ref
-            var cell = ref cells[position.X, position.Y];
+            ref var cells = ref currentState.cells;
+            ref var cell = ref cells[position.X, position.Y];
             cell.backgroundColor = back;
             cell.dirty = true;
             // currentState.cells[position.X, position.Y] = cell;
@@ -167,10 +159,8 @@ namespace nFucks {
         /// <param name="back">Color.</param>
         public void SetForeColor (TermPosition position, ITermColor back) {
             dirty = true;
-            ref
-            var cells = ref currentState.cells;
-            ref
-            var cell = ref cells[position.X, position.Y];
+            ref var cells = ref currentState.cells;
+            ref var cell = ref cells[position.X, position.Y];
             cell.foregroundColor = back;
             cell.dirty = true;
             // currentState.cells[position.X, position.Y] = cell;
@@ -283,7 +273,7 @@ namespace nFucks {
                 rf = fore.AsConsoleColor ();
             else
                 rf = defaultProvider.ProvideFallback (position, true);
-            char data = cell.data, space = ' ';
+            char data = cell.Data, space = ' ';
             if (rf == null && notrans) return false;
             if (rf == null) space = data = (char) 0;
             Console.ForegroundColor = rf ?? Console.ForegroundColor; // don't touch it

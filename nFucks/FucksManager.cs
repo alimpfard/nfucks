@@ -16,6 +16,7 @@ namespace nFucks {
         }
         ~FucksManager () {
             natives.RestoreConsoleMode ();
+            Console.ResetColor();
         }
         /// <summary>
         /// Creates a surface without initializing it
@@ -42,6 +43,19 @@ namespace nFucks {
             surfaces.Add (manager);
             return manager;
         }
+
+        public void PutChar(FucksSurfaceManager surface, char c, ref TermPosition termPosition)
+        {
+            surface.PutChar(c, ref termPosition);
+            dirty = surface.Dirty;
+        }
+
+        public void PutChar(FucksSurfaceManager surface, char c, TermPosition termPosition)
+        {
+            surface.PutChar(c, ref termPosition);
+            dirty = surface.Dirty;
+        }
+        
 
         /// <summary>
         /// Brings a surface to the top, 
@@ -88,6 +102,7 @@ namespace nFucks {
         /// </summary>
         /// <param name="all">whether to redraw all surfaces</param>
         public void renderOnce (bool all = false) {
+            dirty = dirty || surfaces.Any(x => x.Dirty); 
             Console.CursorVisible = false;
             Console.SetCursorPosition (0, 0); //set it to 0,0 to disallow pointless movement
             TermSize sz = TermSize.CurrentTermSize;
