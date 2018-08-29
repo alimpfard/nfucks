@@ -11,8 +11,8 @@ namespace nFucksTest
         {
 			// get a surface at 8,10 with size of 10x40 real characters
 			var surface0 = fucksManager.CreateAndInitializeSurface(new TermPosition(8, 10), new TermResolution(10, 40));
-			// get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters
-			var surface1 = fucksManager.CreateAndInitializeSurface(new TermPosition(0, 0), new TermResolution(10, 40, 1, 2));
+			// get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to '*'
+			var surface1 = fucksManager.CreateAndInitializeSurface(new TermPosition(0, 0), new TermResolution(10, 40, 1, 2), new char[,] { { '*', FucksSurfaceManager.FillValue } });
 			// set the default color scheme of the first surface (foreground is black, background is gray)
 			surface0.defaultProvider = new StaticTermColorProvider(System.ConsoleColor.Black, System.ConsoleColor.Gray);
 
@@ -37,7 +37,17 @@ namespace nFucksTest
 			surface0.drawBounds();
 			surface1.drawBounds();
             TermPosition termPosition = new TermPosition(1, 1);
-			// render one iteration
+            // render one iteration
+
+            // burrow three cells and spread them in a nice surface next to each other
+            using (var tempSurface = surface1.burrowCells(new TermPosition(2, 2), new TermPosition(2, 4), new TermPosition(4, 3)))
+            {
+                // write "te" "st" "th" in those individual cells
+                var posv = new TermPosition(0, 0);
+                tempSurface.PutString("testth", ref posv);
+                // the cells will be automatically merged back into the main surface when this block ends
+            }
+
 			fucksManager.renderOnce();
 			while(true)
             {

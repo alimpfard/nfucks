@@ -5,6 +5,17 @@ namespace nFucks {
         //public int metadata;
         public bool dirty;
         public ITermColor backgroundColor, foregroundColor;
+        private char[,] fillPattern;
+        public char[,] FillPattern
+        {
+            get => fillPattern;
+            set
+            {
+                if (fillPattern == value) return;
+                fillPattern = value;
+                dirty = true;
+            }
+        }
         public char Data
         {
             get => data;
@@ -17,6 +28,11 @@ namespace nFucks {
                     dirty = true;
                 }
             }
+        }
+        public char UnsafeData
+        {
+            get => data;
+            set => data = value;
         }
     }
 }

@@ -2,18 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace nFucks {
-    public class FucksManager {
-        List<FucksSurfaceManager> surfaces = new List<FucksSurfaceManager> ();
+namespace nFucks
+{
+    public partial class FucksManager {
+        List<FucksSurfaceManager> surfaces = new List<FucksSurfaceManager>();
         private bool invalidated = false;
         private bool dirty = false;
-        private GlobalTermInfo currentInfo = new GlobalTermInfo (TermSize.CurrentTermSize);
-        private GlobalTermState[, ] renderState;
-        private Natives natives = new Natives ();
-        public FucksManager () {
-            natives.SetConsoleRaw ();
+        private GlobalTermInfo currentInfo = new GlobalTermInfo(TermSize.CurrentTermSize);
+        private GlobalTermState[,] renderState;
+        private Natives natives = new Natives();
+
+        public FucksManager() {
+            natives.SetConsoleRaw();
             renderState = new GlobalTermState[currentInfo.size.X, currentInfo.size.Y];
         }
+
         ~FucksManager () {
             natives.RestoreConsoleMode ();
             Console.ResetColor();
@@ -41,6 +44,22 @@ namespace nFucks {
             var manager = new FucksSurfaceManager (position, sz, resolution, BasicColor.Default);
             manager.Initialize ();
             surfaces.Add (manager);
+            return manager;
+        }
+
+        /// <summary>
+        /// Creates and initializes a surface
+        /// </summary>
+        /// <param name="position">the top-left corner of the surface, in global terms</param>
+        /// <param name="resolution">the resolution of the surface</param>
+        /// <param name="v">the fill pattern of the surface</param>
+        /// <returns></returns>
+        public FucksSurfaceManager CreateAndInitializeSurface(TermPosition position, TermResolution resolution, char[,] v)
+        {
+            var sz = new TermSize(resolution.Xres, resolution.Yres);
+            var manager = new FucksSurfaceManager(position, sz, resolution, BasicColor.Default);
+            manager.Initialize(v);
+            surfaces.Add(manager);
             return manager;
         }
 

@@ -1,4 +1,6 @@
 using System;
+using static nFucks.FucksManager;
+
 namespace nFucks {
     public partial class FucksSurfaceManager {
         readonly int MAX_HISTORY = 4;
@@ -10,6 +12,7 @@ namespace nFucks {
         private bool dirty = false;
         private bool forced_dirty = false;
         private TermPosition positionDelta;
+        public const char FillValue = (char)0;
 
         public TermPosition PositionDelta { get => positionDelta; private set => positionDelta = value; }
         public bool Dirty { get => dirty; }
@@ -57,13 +60,38 @@ namespace nFucks {
         /// (Fills the cell buffer)
         /// this may be skipped
         /// </summary>
-        public void Initialize () {
+        public void Initialize()
+        {
             for (int x = 0; x < bounds.X; x++)
-                for (int y = 0; y < bounds.Y; y++) {
-                    ref
-                    var cell = ref currentState.cells[x, y];
+                for (int y = 0; y < bounds.Y; y++)
+                {
+                    ref var cell = ref currentState.cells[x, y];
                     cell.Data = ' ';
+                    cell.FillPattern = new char[currentState.resolution.Xscale, currentState.resolution.Yscale];
+                    for (int i = 0; i < currentState.resolution.Xscale; i++)
+                        for (int j = 0; j < currentState.resolution.Yscale; j++)
+                            cell.FillPattern[i, j] = i == j && i == 0 ? FillValue : ' ';
                 }
+        }
+
+        /// <summary>
+        /// Initialize this instance, set the fill pattern of all cells to <c>pat</c>
+        /// </summary>
+        /// <param name="pat">The fill pattern of the cells</param>
+        public void Initialize(char[,] pat)
+        {
+            for (int x = 0; x < bounds.X; x++)
+                for (int y = 0; y < bounds.Y; y++)
+                {
+                    ref var cell = ref currentState.cells[x, y];
+                    cell.Data = ' ';
+                    cell.FillPattern = (char[,])pat.Clone();
+                }
+        }
+
+        public WithBurrowedCell burrowCells(params TermPosition[] pos)
+        {
+            return new WithBurrowedCell(ref currentState.cells, ref currentState.resolution, pos);
         }
 
         /// <summary>
@@ -122,7 +150,6 @@ namespace nFucks {
             ref var cells = ref currentState.cells;
             ref var cell = ref cells[position.X, position.Y];
             cell.Data = c;
-            // currentState.cells[position.X, position.Y] = cell;
         }
 
         /// <summary>
@@ -135,7 +162,10 @@ namespace nFucks {
             ref var cells = ref currentState.cells;
             ref var cell = ref cells[position.X, position.Y];
             cell.Data = c;
-            position.advanceRight (bounds);
+            if (c == '\n' || c == '\r')
+                position.advanceDown(bounds);
+            else
+                position.advanceRight(bounds);
         }
 
         /// <summary>
@@ -178,6 +208,18 @@ namespace nFucks {
             dirty = true;
             forced_dirty = true;
             // CheckBoundsValid();
+        }
+
+        /// <summary>
+        /// Sets the fill pattern of a cell (a pattern of <code>FucksSurfaceManager.FillValue</code> means to put the value of the cell here
+        /// </summary>
+        /// <param name="pattern">A char matrix pattern</param>
+        /// <param name="pos">position of the cell</param>
+        public void SetFillPattern(char[,] pattern, TermPosition pos)
+        {
+            ref var cell = ref currentState.cells[pos.X, pos.Y];
+            cell.FillPattern = pattern;
+            dirty = dirty || cell.dirty;
         }
 
         /// <summary>
@@ -273,15 +315,17 @@ namespace nFucks {
                 rf = fore.AsConsoleColor ();
             else
                 rf = defaultProvider.ProvideFallback (position, true);
-            char data = cell.Data, space = ' ';
+            char data = cell.Data;
             if (rf == null && notrans) return false;
-            if (rf == null) space = data = (char) 0;
+            if (rf == null) data = (char) 0;
             Console.ForegroundColor = rf ?? Console.ForegroundColor; // don't touch it
             TermPosition normalized = (position + surfacePosition).ScaledUp (xs, ys);
             for (int i = 0; i < xs; i++)
                 for (int j = 0; j < ys; j++) {
                     Console.SetCursorPosition (normalized.Y + j, normalized.X + i);
-                    Console.Write (i + j == 0 ? data : space);
+                    char fill = cell.FillPattern[i, j];
+                    if (fill == FillValue) fill = data;
+                    Console.Write (fill);
                 }
             return true;
         }
