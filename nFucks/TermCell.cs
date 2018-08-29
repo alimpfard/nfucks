@@ -1,10 +1,8 @@
-﻿namespace nFucks
-{
-    public struct TermCell
-    {
-		public char data;
-		public  int metadata;
-		public bool dirty;
-		public ITermColor backgroundColor, foregroundColor;
+namespace nFucks {
+    public struct TermCell {
+        public char data;
+        //public int metadata;
+        public bool dirty;
+        public ITermColor backgroundColor, foregroundColor;
     }
 }

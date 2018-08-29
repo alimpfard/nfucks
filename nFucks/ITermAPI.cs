@@ -1,7 +1,4 @@
-﻿using System;
-namespace nFucks
-{
-    public interface ITermAPI
-    {
-    }
+using System;
+namespace nFucks {
+    public interface ITermAPI { }
 }

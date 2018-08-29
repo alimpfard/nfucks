@@ -1,10 +1,8 @@
-﻿namespace nFucks
-{
-        public enum RenderState
-        {
-            Rendered = 1,
-            Skipped,
-            NotInBounds,
-            IgnoreIfPossible = 5
+namespace nFucks {
+    public enum RenderState {
+        Rendered = 1,
+        Skipped,
+        NotInBounds,
+        IgnoreIfPossible = 5
         };
 }
