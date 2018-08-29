@@ -11,9 +11,15 @@ namespace nFucks
 		private bool dirty = false;
 		private GlobalTermInfo currentInfo = new GlobalTermInfo(TermSize.CurrentTermSize);
 		private GlobalTermState[,] renderState;
+		private Natives natives = new Natives();
 		public FucksManager()
 		{
+			natives.SetConsoleRaw();
 			renderState = new GlobalTermState[currentInfo.size.X, currentInfo.size.Y];
+		}
+		~FucksManager()
+		{
+			natives.RestoreConsoleMode();
 		}
 		public FucksSurfaceManager CreateSurface(TermPosition position, TermResolution resolution)
 		{
