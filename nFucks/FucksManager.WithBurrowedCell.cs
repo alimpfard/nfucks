@@ -11,8 +11,10 @@ namespace nFucks
             
             private TermCell[,] mCells; // a <pRes.Xscale, pRes.Yscale*Addrs.length> matrix, with all the cells spread to 1x1 
             private TermSize bounds;
-            public WithBurrowedCell(ref TermCell[,] cells, ref TermResolution res, TermPosition[] cell_addrs)
+            private bool no_respect_old_pattern;
+            public WithBurrowedCell(ref TermCell[,] cells, ref TermResolution res, TermPosition[] cell_addrs, bool new_pat = false)
             {
+                no_respect_old_pattern = new_pat;
                 Addrs = cell_addrs;
                 pRes = res;
                 Res = new TermResolution(res.Xscale, Addrs.Length * res.Yscale);
@@ -41,18 +43,25 @@ namespace nFucks
                     ref var addr = ref Addrs[idx];
                     var maddry = idx * pRes.Yscale;
                     ref var cell = ref Cells[addr.X, addr.Y];
-                    var computedFillPattern = cell.FillPattern; // only the non-FillValue patterns will be changed
+                    var computedFillPattern = (char[,])cell.FillPattern.Clone(); // only the non-FillValue patterns will be changed
                     char? data = null;
                     for (int i = 0; i < computedFillPattern.GetLength(0); i++)
                         for (int j = 0; j < computedFillPattern.GetLength(1); j++)
                         {
                             ref var mcell = ref mCells[i, maddry + j];
-                            char pat = computedFillPattern[i, j];
+                            var mfp = mcell.FillPattern;
+                            char pat = no_respect_old_pattern && mfp != null ? mfp[0, 0] : computedFillPattern[i, j] ;
                             if (pat == FucksSurfaceManager.FillValue)
                             {
                                 if (data != null && mcell.Data != data)
-                                    throw new InvalidOperationException("Inconsistency in cell pattern and spread values");
-                                data = mcell.Data;
+                                {
+                                    if (no_respect_old_pattern)
+                                        computedFillPattern[i, j] = mcell.Data;
+                                    else 
+                                        throw new InvalidOperationException($"Inconsistency in cell pattern and spread values: Expected '{data}' but found '{mcell.Data}'");
+                                }
+                                else 
+                                    data = mcell.Data;
                             }
                             else
                                 computedFillPattern[i, j] = mcell.Data;

@@ -91,9 +91,25 @@ namespace nFucks {
                 }
         }
 
+        /// <summary>
+        /// Burrows some select cells and spreads them in a <code>[resolution.Xscale, count*resolution.Yscale]</code> grid of <code>[1, 1]</code> cells
+        /// </summary>
+        /// <param name="pos">any number of cell positions on the surface</param>
+        /// <returns>an IDisposable surface-esque object</returns>
         public WithBurrowedCell burrowCells(params TermPosition[] pos)
         {
             return new WithBurrowedCell(ref currentState.cells, ref currentState.resolution, pos);
+        }
+
+        /// <summary>
+        /// Burrows some select cells and spreads them in a <code>[resolution.Xscale, count*resolution.Yscale]</code> grid of <code>[1, 1]</code> cells
+        /// </summary>
+        /// <param name="pos">any number of cell positions on the surface</param>
+        /// <param name="new_pat">whether to ignore <i>all</i> the old patterns</param>
+        /// <returns>an IDisposable surface-esque object</returns>
+        public WithBurrowedCell burrowCells(bool new_pat, params TermPosition[] pos)
+        {
+            return new WithBurrowedCell(ref currentState.cells, ref currentState.resolution, pos, new_pat);
         }
 
         /// <summary>
