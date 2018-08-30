@@ -49,19 +49,20 @@ namespace nFucksTest
             }
 
 			fucksManager.renderOnce();
+            int i = 0;
 			while(true)
             {
-                fucksManager.PutChar(surface0, System.Console.ReadKey().KeyChar, ref termPosition);
+                i++;
+                fucksManager.PutChar(surface0, System.Console.ReadKey(true).KeyChar, ref termPosition);
                 // focus the first surface and render it
-                //fucksManager.Focus(surface0);
+                // fucksManager.Focus(i%2==1 ? surface0 : surface1);
                 fucksManager.renderOnce();
-
-
-				// focus the second surface, move it around and render it again
+                
+                // focus the second surface, move it around and render it again
                 // fucksManager.Focus(surface1);
                 // move the surface around a bit            
-				//fucksManager.Translate(surface1, (i % 3 - 1), (i % 3 - 1) * -1);
-				//fucksManager.renderOnce();
+				// fucksManager.Translate(surface1, (i % 4 - 1), (i % 2 - 1) * -1);
+				fucksManager.renderOnce();
             }
 		}
     }

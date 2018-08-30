@@ -13,6 +13,7 @@ namespace nFucks {
         private bool forced_dirty = false;
         private TermPosition positionDelta;
         public const char FillValue = (char)0;
+        private int dirty_count;
 
         public TermPosition PositionDelta { get => positionDelta; private set => positionDelta = value; }
         public bool Dirty { get => dirty; }
@@ -65,6 +66,7 @@ namespace nFucks {
             for (int x = 0; x < bounds.X; x++)
                 for (int y = 0; y < bounds.Y; y++)
                 {
+                    dirty_count++;
                     ref var cell = ref currentState.cells[x, y];
                     cell.Data = ' ';
                     cell.FillPattern = new char[currentState.resolution.Xscale, currentState.resolution.Yscale];
@@ -100,6 +102,16 @@ namespace nFucks {
         public void MarkDirty () {
             dirty = true;
             forced_dirty = true;
+        }
+
+        /// <summary>
+        /// set the surface clean
+        /// </summary>
+        public void MarkClean()
+        {
+            dirty = false;
+            forced_dirty = false;
+            dirty_count = 0;
         }
 
         /// <summary>
@@ -146,10 +158,14 @@ namespace nFucks {
         /// <param name="c">Character to put.</param>
         /// <param name="position">Local (surface-wide) position of the cell.</param>
         public void PutChar (char c, TermPosition position) {
-            dirty = true;
             ref var cells = ref currentState.cells;
             ref var cell = ref cells[position.X, position.Y];
             cell.Data = c;
+            if (cell.dirty)
+            {
+                dirty = true;
+                dirty_count++;
+            }
         }
 
         /// <summary>
@@ -158,10 +174,14 @@ namespace nFucks {
         /// <param name="c">Character to put.</param>
         /// <param name="position">(reference) Local (surface-wide) position of the cell.</param>
         public void PutChar (char c, ref TermPosition position) {
-            dirty = true;
             ref var cells = ref currentState.cells;
             ref var cell = ref cells[position.X, position.Y];
             cell.Data = c;
+            if (cell.dirty)
+            {
+                dirty = true;
+                dirty_count++;
+            }
             if (c == '\n' || c == '\r')
                 position.advanceDown(bounds);
             else
@@ -202,12 +222,17 @@ namespace nFucks {
         /// <param name="x"> Translation along the X axis</param>
         /// <param name="y"> Translation along the Y axis</param>
         public void Translate (int x, int y) {
-            var spl = surfacePosition;
             surfacePosition.Translate (x, y);
             PositionDelta.Set (x, y);
             dirty = true;
             forced_dirty = true;
-            // CheckBoundsValid();
+            CheckBoundsValid();
+        }
+
+        private void CheckBoundsValid()
+        {
+            if (surfacePosition.X < 0 || surfacePosition.Y < 0)
+                throw new InvalidOperationException("Translation to invalid bounds");
         }
 
         /// <summary>
@@ -300,8 +325,9 @@ namespace nFucks {
         /// <param name="xs">X scale of the current cell complex</param>
         /// <param name="ys">Y scale of the current cell complex</param>
         /// <param name="notrans">if set to <c>true</c> will ignore transparency</param>
+        /// <param name="force">force the cell to be rendered</param>
         /// <returns>whether the cell was rendered</returns>
-        private bool renderCell (ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false) {
+        private bool renderCell (ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false, bool force = false) {
             cell.dirty = false;
             ITermColor back = cell.backgroundColor, fore = cell.foregroundColor;
             ConsoleColor? rf;
@@ -351,48 +377,20 @@ namespace nFucks {
             return LocalInBounds (position);
         }
 
-        public RenderState RenderIfInBounds (TermPosition position) {
-            if (RaytraceLocal (ref position)) {
-                ref
-                var cell = ref currentState.cells[position.X, position.Y];
-                if (!dirty && !cell.dirty) return RenderState.Skipped;
-                if (!renderCell (ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale))
-                    return RenderState.IgnoreIfPossible; //it was a "hole"
-                return RenderState.Rendered;
-            }
-            return RenderState.NotInBounds;
-        }
-
-        /// <summary>
-        /// Tries to render the cell at a global position if it is in bounds
-        /// </summary>
-        /// <param name="position">The global position of the cell</param>
-        /// <param name="force">whether to forefully render the cell</param>
-        /// <returns>the status of the render</returns>
-        public RenderState RenderIfInBounds (TermPosition position, bool force) {
-            if (RaytraceLocal (ref position)) {
-                ref
-                var cell = ref currentState.cells[position.X, position.Y];
-                if (!force && !dirty && !cell.dirty) return RenderState.Skipped;
-                if (!renderCell (ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale))
-                    return RenderState.IgnoreIfPossible; //it was a "hole"
-                return RenderState.Rendered;
-            }
-            return RenderState.NotInBounds;
-        }
         /// <summary>
         /// Tries to render the cell at a global position if it is in bounds
         /// </summary>
         /// <param name="position">The global position of the cell</param>
         /// <param name="force">whether to forefully render the cell</param>
         /// <param name="notrans">whether to ignore transparency</param>
+        /// <param name="redraw">whether to redraw the cell without regards to anything</param>
         /// <returns>the status of the render</returns>
-        public RenderState RenderIfInBounds (TermPosition position, bool force, bool notrans) {
+        public RenderState RenderIfInBounds (TermPosition position, bool force = false, bool notrans = false, bool redraw = false) {
             if (RaytraceLocal (ref position)) {
-                ref
-                var cell = ref currentState.cells[position.X, position.Y];
-                if (!force && !dirty && !cell.dirty) return RenderState.Skipped;
-                if (!renderCell (ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale, notrans))
+                ref var cell = ref currentState.cells[position.X, position.Y];
+                if (!(force || forced_dirty || cell.dirty || dirty_count > 0 || redraw)) return RenderState.Skipped;
+                dirty_count--;
+                if (!renderCell (ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale, notrans, redraw))
                     return RenderState.IgnoreIfPossible; //it was a "hole" 
                 return RenderState.Rendered;
             }
@@ -439,6 +437,11 @@ namespace nFucks {
              *  |                      | <
              * +-----------------+
              */
+        }
+
+        public override string ToString()
+        {
+            return $"Surface{{{surfacePosition}-{bounds}}}";
         }
     }
 }

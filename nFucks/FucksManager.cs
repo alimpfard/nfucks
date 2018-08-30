@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace nFucks
 {
@@ -85,6 +84,7 @@ namespace nFucks
             int idx = surfaces.FindIndex ((obj) => obj == surface);
             if (idx == surfaces.Count - 1) return;
             surfaces.Swap (idx, surfaces.Count - 1);
+            surfaces.ForEach(mgr => mgr.MarkDirty()); //XXX this redraws the whole frame
             dirty = true;
         }
 
@@ -105,6 +105,8 @@ namespace nFucks
         public void Translate (FucksSurfaceManager manager, int x, int y) {
             invalidated = true;
             manager.Translate (x, y);
+            dirty = true;
+            surfaces.ForEach(mgr => mgr.MarkDirty()); //XXX this redraws the whole frame
         }
         /// <summary>
         /// Clears a cell unconditionally
@@ -120,38 +122,49 @@ namespace nFucks
         /// Renders one iteration of all surfaces
         /// </summary>
         /// <param name="all">whether to redraw all surfaces</param>
-        public void renderOnce (bool all = false) {
-            dirty = dirty || surfaces.Any(x => x.Dirty); 
-            Console.CursorVisible = false;
-            Console.SetCursorPosition (0, 0); //set it to 0,0 to disallow pointless movement
+        public void renderOnce(bool all = false)
+        {
+            dirty = dirty || surfaces.Any(x => x.Dirty);
+            Console.SetCursorPosition(0, 0);
             TermSize sz = TermSize.CurrentTermSize;
-            if (sz != currentInfo.size) {
+            if (sz != currentInfo.size)
+            {
                 currentInfo.size = sz;
                 renderState = new GlobalTermState[sz.X, sz.Y]; //TODO Realloc instead?
                 invalidated = true;
             }
-            all = all || invalidated;
-            if (invalidated) {
-                Console.ResetColor ();
-                Console.Clear ();
+            if (invalidated)
+            {
+                Console.ResetColor();
+                Console.Clear();
+                clearRenderState();
+                // TODO clear translation artefacts
             }
+            all = all || invalidated;
             TermPosition position;
             int surfaceCount = surfaces.Count;
             for (position.X = 0; position.X < sz.X; position.X++)
-                for (position.Y = 0; position.Y < sz.Y; position.Y++) {
-                    if (!dirty && !renderState[position.X, position.Y].dirty && renderState[position.X, position.Y].rendered) continue;
-                    for (int i = 0; i < surfaceCount; i++) {
+                for (position.Y = 0; position.Y < sz.Y; position.Y++)
+                {
+                    if (!(all || dirty || renderState[position.X, position.Y].dirty && renderState[position.X, position.Y].rendered))
+                        continue;
+                    for (int i = 0; i < surfaceCount; i++)
+                    {
                         var sf = surfaces[i];
-                        var rst = sf.RenderIfInBounds (position, all);
-                        if (rst != RenderState.NotInBounds) {
+                        ref var resolution = ref sf.currentState.resolution;
+                        var rst = sf.RenderIfInBounds(position, all, redraw: invalidated);
+                        if (rst != RenderState.NotInBounds)
+                        {
                             if (rst == RenderState.IgnoreIfPossible)
-                                if (i == surfaceCount - 1) {
+                                if (i == surfaceCount - 1)
+                                {
                                     // ask it to render with a default background color
-                                    sf.RenderIfInBounds (position, all, true);
+                                    sf.RenderIfInBounds(position, all, true, invalidated);
                                 }
-                            else continue;
-                            for (int x = 0; x < sf.currentState.resolution.Xscale; x++)
-                                for (int y = 0; y < sf.currentState.resolution.Yscale; y++) {
+                                else continue;
+                            for (int x = 0; x < resolution.Xscale; x++)
+                                for (int y = 0; y < resolution.Yscale; y++)
+                                {
                                     ref
                                     var rs = ref renderState[position.X + x, position.Y + y];
                                     rs.rendered = true;
@@ -160,16 +173,38 @@ namespace nFucks
                             break;
                         }
                     }
-                    ref
-                    var rs0 = ref renderState[position.X, position.Y];
-                    if (!rs0.rendered) {
-                        ClearCell (position);
+                    ref var rs0 = ref renderState[position.X, position.Y];
+                    if (!rs0.rendered)
+                    {
+                        ClearCell(position);
                         rs0.rendered = true;
                         rs0.dirty = false;
                     }
                 }
             invalidated = false;
-            Console.CursorVisible = true;
+            surfaces.ForEach(sf => sf.MarkClean());
+        }
+
+        private void clearRenderState()
+        {
+            foreach (var srf in surfaces)
+            {
+                var st = srf.surfacePosition;
+                var bo = srf.bounds.Scale(srf.currentState.resolution.Xscale, srf.currentState.resolution.Yscale);
+                int y = st.Y;
+                for (; st.X < bo.X; st.X++)
+                    for (st.Y = y; st.Y < bo.Y; st.Y++)
+                    {
+                        ref var rs = ref renderState[st.X, st.Y];
+                        rs.rendered = false;
+                        rs.dirty = true;
+                    }
+            }
+        }
+
+        public override string ToString()
+        {
+            return surfaces.ToString();
         }
     }
 }
