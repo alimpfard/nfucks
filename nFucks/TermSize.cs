@@ -11,7 +11,7 @@ namespace nFucks {
             return ts0.X == ts1.Y && ts0.Y == ts1.Y;
         }
         public static bool operator != (TermSize ts0, TermSize ts1) {
-            return ts0.X == ts1.Y && ts0.Y == ts1.Y;
+            return ts0.X != ts1.Y && ts0.Y != ts1.Y;
         }
         public static TermSize CurrentTermSize => new TermSize (Console.WindowHeight, Console.WindowWidth);
         public TermSize Scaled (int x, int y) {
