@@ -14,12 +14,13 @@ namespace nFucks {
 		private TermPosition positionDelta;
 		public const char FillValue = (char)0;
 		private int dirty_count;
-		private bool ResizeWithConsole = false;
+		private bool resizeWithConsole = false;
 
 		public TermPosition PositionDelta { get => positionDelta; private set => positionDelta = value; }
 		public bool Dirty { get => dirty; }
+        public bool ResizeWithConsole { get => resizeWithConsole; private set => resizeWithConsole = value; }
 
-		public delegate void RefAction<T1> (ref T1 arg1);
+        public delegate void RefAction<T1> (ref T1 arg1);
 
 		#region Constructors
 		public FucksSurfaceManager ()
