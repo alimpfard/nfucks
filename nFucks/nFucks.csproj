@@ -51,6 +51,7 @@
     <Compile Include="GlobalTermState.cs" />
     <Compile Include="GlobalTermInfo.cs" />
     <Compile Include="Natives.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

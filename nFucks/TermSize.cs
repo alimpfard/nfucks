@@ -22,7 +22,6 @@ namespace nFucks {
         public TermSize Scale (int x, int y) {
             return new TermSize (X / x, Y / y);
         }
-
         public override bool Equals (object obj) {
             return obj is TermSize && this == (TermSize) obj;
         }
@@ -34,5 +33,11 @@ namespace nFucks {
         public override string ToString () {
             return String.Format ("<{0}x{1}>", X, Y);
         }
-    }
+
+		internal void ScaleUp (int xscaled, int yscaled)
+		{
+			X *= xscaled;
+			Y *= yscaled;
+		}
+	}
 }

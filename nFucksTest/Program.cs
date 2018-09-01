@@ -11,6 +11,7 @@ namespace nFucksTest
         {
 			// get a surface at 8,10 with size of 10x40 real characters
 			var surface0 = fucksManager.CreateAndInitializeSurface(new TermPosition(8, 10), new TermResolution(10, 40));
+			surface0.ResizeWithConsole = true;
 			// get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to '*'
 			var surface1 = fucksManager.CreateAndInitializeSurface(new TermPosition(0, 0), new TermResolution(10, 40, 1, 2), new char[,] { { ' ', FucksSurfaceManager.FillValue } });
 			// set the default color scheme of the first surface (foreground is black, background is gray)

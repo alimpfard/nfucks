@@ -10,7 +10,7 @@ namespace nFucks
         private GlobalTermInfo currentInfo = new GlobalTermInfo(TermSize.CurrentTermSize);
         private GlobalTermState[,] renderState;
         private Natives natives = new Natives();
-
+        
         public FucksManager() {
             natives.SetConsoleRaw();
             renderState = new GlobalTermState[currentInfo.size.X, currentInfo.size.Y];
@@ -129,8 +129,17 @@ namespace nFucks
             TermSize sz = TermSize.CurrentTermSize;
             if (sz != currentInfo.size)
             {
+                int Xscaled = sz.X / currentInfo.size.X ;
+                int Yscaled = sz.Y / currentInfo.size.Y;
                 currentInfo.size = sz;
                 renderState = new GlobalTermState[sz.X, sz.Y]; //TODO Realloc instead?
+                foreach (var surface in surfaces) 
+                {
+                    if (surface.ResizeWithConsole) 
+                    {
+                        surface.Scale(Xscaled, Yscaled);
+                    }
+                }
                 invalidated = true;
             }
             if (invalidated)

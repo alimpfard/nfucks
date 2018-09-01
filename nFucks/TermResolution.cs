@@ -1,7 +1,7 @@
 using System;
 namespace nFucks {
     public struct TermResolution {
-        public readonly int Xres, Yres, Xscale, Yscale;
+        public int Xres, Yres, Xscale, Yscale;
         public TermResolution (int xres, int yres) {
             Xres = xres;
             Yres = yres;
