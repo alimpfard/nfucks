@@ -82,6 +82,8 @@ namespace nFucks {
         }
 
         internal void ScaledDown (int xscale, int yscale) {
+            xscale = xscale == 0 ? 1 : xscale;
+            yscale = yscale == 0 ? 1 : yscale;
             X /= xscale;
             Y /= yscale;
         }

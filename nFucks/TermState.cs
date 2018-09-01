@@ -12,9 +12,9 @@ namespace nFucks {
 		{
 			resolution.Xscale *= x;
 			resolution.Yscale *= y;
-			resolution.Xres--;
-			resolution.Yres--;
-			Utils.ResizeArray (ref cells, resolution.Xres*x, resolution.Yres*y);
+            resolution.Xres *= x;
+            resolution.Yres *= y;
+			Utils.ResizeArray (ref cells, resolution.Xres, resolution.Yres);
 		}
 	}
 }

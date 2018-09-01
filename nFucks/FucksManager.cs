@@ -135,10 +135,11 @@ namespace nFucks
                 renderState = new GlobalTermState[sz.X, sz.Y]; //TODO Realloc instead?
                 foreach (var surface in surfaces) 
                 {
-                    if (surface.ResizeWithConsole) 
+                    if (surface.ResizeWithConsole)
                     {
                         surface.Scale(Xscaled, Yscaled);
                     }
+                    surface.MarkDirty();
                 }
                 invalidated = true;
             }

@@ -15,11 +15,15 @@ namespace nFucks {
         }
         public static TermSize CurrentTermSize => new TermSize (Console.WindowHeight, Console.WindowWidth);
         public TermSize Scaled (int x, int y) {
+            x = x == 0 ? 1 : x;
+            y = y == 0 ? 1 : y;
             X /= x;
             Y /= y;
             return this;
         }
         public TermSize Scale (int x, int y) {
+            x = x == 0 ? 1 : x;
+            y = y == 0 ? 1 : y;
             return new TermSize (X / x, Y / y);
         }
         public override bool Equals (object obj) {

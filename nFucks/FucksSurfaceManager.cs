@@ -14,7 +14,7 @@ namespace nFucks {
 		private TermPosition positionDelta;
 		public const char FillValue = (char)0;
 		private int dirty_count;
-		public bool ResizeWithConsole = false;
+		private bool ResizeWithConsole = false;
 
 		public TermPosition PositionDelta { get => positionDelta; private set => positionDelta = value; }
 		public bool Dirty { get => dirty; }
