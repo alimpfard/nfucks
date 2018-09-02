@@ -15,10 +15,10 @@ namespace nFucks {
         }
         public static TermSize CurrentTermSize => new TermSize (Console.WindowHeight, Console.WindowWidth);
         public static TermSize TrySetTerminalSize (int x, int y) {
-            Console.SetWindowSize(x, y);
+            Console.SetWindowSize (x, y);
             var ts = CurrentTermSize;
             if (ts.X != x || ts.Y != y)
-                throw new InvalidOperationException("Could not change terminal size");
+                throw new InvalidOperationException ("Could not change terminal size");
             return CurrentTermSize;
         }
         public TermSize Scaled (int x, int y) {

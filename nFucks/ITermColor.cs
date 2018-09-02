@@ -38,7 +38,8 @@ namespace nFucks {
         }
         public override System.ConsoleColor? AsConsoleColor () {
             return color;
-        }public override System.ConsoleColor? ProvideFallback (TermPosition position, bool foreground) {
+        }
+        public override System.ConsoleColor? ProvideFallback (TermPosition position, bool foreground) {
             return color;
         }
     }
