@@ -441,7 +441,7 @@ namespace nFucks {
                     }
                     PutChar (c, pos);
                     if (bac != null) SetBackColor (pos, bac);
-                    if (fore != null) SetBackColor (pos, fore);
+                    if (fore != null) SetForeColor (pos, fore);
                 }
                 if (str_idx == strlen) {
                     pos.Y--;
