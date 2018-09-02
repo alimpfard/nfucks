@@ -53,7 +53,24 @@ namespace nFucksTest
 			while(true)
             {
                 i++;
-                fucksManager.PutChar(surface0, System.Console.ReadKey(true).KeyChar, ref termPosition);
+				var key = System.Console.ReadKey(true);
+				switch (key.Key) {
+					case System.ConsoleKey.UpArrow:
+						fucksManager.Translate(surface0, -1, 0);
+						break;
+					case System.ConsoleKey.DownArrow:
+						fucksManager.Translate(surface0, 1, 0);
+						break;
+					case System.ConsoleKey.LeftArrow:
+						fucksManager.Translate(surface0, 0, -1);
+						break;
+					case System.ConsoleKey.RightArrow:
+						fucksManager.Translate(surface0, 0, 1);
+						break;
+	                default:
+					fucksManager.PutChar(surface0, key.KeyChar, ref termPosition);
+					break;
+				}
                 // focus the first surface and render it
                 // fucksManager.Focus(i%2==1 ? surface0 : surface1);
                 fucksManager.renderOnce();

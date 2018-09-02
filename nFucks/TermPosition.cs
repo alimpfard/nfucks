@@ -91,7 +91,12 @@ namespace nFucks {
         internal TermPosition CompoundMaxmimumBound (TermPosition positionDelta) {
             return new TermPosition (Math.Min (X, X - positionDelta.X), Math.Min (Y, Y - positionDelta.Y));
         }
-
+        internal TermPosition CompoundMaxmimumBound (int x, int y) {
+            return new TermPosition (Math.Max (X, X + x), Math.Max (Y, Y + y));
+        }
+        internal TermPosition CompoundMinimumBound (int x, int y) {
+            return new TermPosition (Math.Min (X, X + x), Math.Min (Y, Y + y));
+        }
         internal TermPosition CompoundMaxmimumBound (TermSize positionAddition) {
             return new TermPosition (Math.Max (X, X + positionAddition.X), Math.Max (Y, Y + positionAddition.Y));
     }

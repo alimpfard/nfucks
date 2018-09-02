@@ -2,7 +2,7 @@
 
 A minimal library for updating and drawing terminal-based TUIs and character screens.
 
-Current optimization level: ~absolute crap~ ~tolerable~ almost fast enough
+Current optimization level: ~absolute crap~ ~tolerable~ ~almost fast enough~ decent
 
 ### Capabilities
 + Multiple surface buffer management

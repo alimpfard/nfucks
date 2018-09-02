@@ -43,5 +43,8 @@ namespace nFucks {
 			X *= xscaled;
 			Y *= yscaled;
 		}
+        internal TermPosition CompoundMaximumBound (int x, int y) {
+            return new TermPosition (Math.Max (X, X + x), Math.Max (Y, Y + y));
+        }
 	}
 }

@@ -142,6 +142,14 @@ namespace nFucks {
 			forced_dirty = true;
 		}
 
+		public void MarkCellDirtyIfInBounds(TermPosition pos) 
+		{
+			if (RaytraceLocal(ref pos)) {
+				currentState.cells[pos.X, pos.Y].dirty = true;
+				dirty_count++;
+			}
+		}
+
 		/// <summary>
 		/// set the surface clean
 		/// </summary>
