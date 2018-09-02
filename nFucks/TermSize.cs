@@ -14,6 +14,13 @@ namespace nFucks {
             return ts0.X != ts1.Y && ts0.Y != ts1.Y;
         }
         public static TermSize CurrentTermSize => new TermSize (Console.WindowHeight, Console.WindowWidth);
+        public static TermSize TrySetTerminalSize (int x, int y) {
+            Console.SetWindowSize(x, y);
+            var ts = CurrentTermSize;
+            if (ts.X != x || ts.Y != y)
+                throw new InvalidOperationException("Could not change terminal size");
+            return CurrentTermSize;
+        }
         public TermSize Scaled (int x, int y) {
             x = x == 0 ? 1 : x;
             y = y == 0 ? 1 : y;

@@ -31,4 +31,15 @@ namespace nFucks {
             return foreground ? fore : back;
         }
     }
+    public class StaticSingleTermColorProvider : AbstractTermColorProvider {
+        System.ConsoleColor? color;
+        public StaticSingleTermColorProvider (System.ConsoleColor? f0) {
+            color = f0;
+        }
+        public override System.ConsoleColor? AsConsoleColor () {
+            return color;
+        }public override System.ConsoleColor? ProvideFallback (TermPosition position, bool foreground) {
+            return color;
+        }
+    }
 }

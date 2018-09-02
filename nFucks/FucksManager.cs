@@ -46,6 +46,18 @@ namespace nFucks {
         }
 
         /// <summary>
+        /// Creates and initializes a surface encompasses the whole terminal
+        /// </summary>
+        /// <returns>The surface</returns>
+        public FucksSurfaceManager CreateAndInitializeFullSurface () {
+            var sz = TermSize.CurrentTermSize;
+            var manager = new FucksSurfaceManager (TermPosition.Origin, sz, BasicColor.Default);
+            manager.Initialize ();
+            surfaces.Add (manager);
+            return manager;
+        }
+
+        /// <summary>
         /// Creates and initializes a surface
         /// </summary>
         /// <param name="position">the top-left corner of the surface, in global terms</param>

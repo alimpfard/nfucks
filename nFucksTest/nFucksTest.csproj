@@ -42,5 +42,10 @@
       <Name>nFucks</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="yohane.color">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

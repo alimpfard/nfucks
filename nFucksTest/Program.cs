@@ -2,10 +2,15 @@ using nFucks;
 
 namespace nFucksTest {
     class MainClass {
-        static TermSize resv = TermSize.CurrentTermSize;
+        static TermSize resv = TermSize.CurrentTermSize;//TrySetTerminalSize(160, 400);
         // get a manager
         static FucksManager fucksManager = new FucksManager ();
         public static void Main (string[] args) {
+			if (resv.Y >= 80)
+			{
+				DrawYohane();
+				return;
+			}
             // get a surface at 8,10 with size of 10x40 real characters
             var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 40));
             // get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to ' '
@@ -76,5 +81,14 @@ namespace nFucksTest {
                 fucksManager.renderOnce ();
             }
         }
+		public static void DrawYohane() {
+			string path = System.AppDomain.CurrentDomain.BaseDirectory + "/yohane.color";
+			var origin = TermPosition.Origin;
+			var surface0 = fucksManager.CreateAndInitializeSurface(origin, new TermResolution(36, 60));
+			using (var sr = new System.IO.StreamReader(path))
+				surface0.PutIRCColoredString(sr.ReadToEnd(), ref origin);
+			fucksManager.renderOnce();
+			System.Console.ReadKey();
+		}
     }
 }
