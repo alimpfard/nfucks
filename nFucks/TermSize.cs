@@ -38,13 +38,12 @@ namespace nFucks {
             return String.Format ("<{0}x{1}>", X, Y);
         }
 
-		internal void ScaleUp (int xscaled, int yscaled)
-		{
-			X *= xscaled;
-			Y *= yscaled;
-		}
+        internal void ScaleUp (int xscaled, int yscaled) {
+            X *= xscaled;
+            Y *= yscaled;
+        }
         internal TermPosition CompoundMaximumBound (int x, int y) {
             return new TermPosition (Math.Max (X, X + x), Math.Max (Y, Y + y));
         }
-	}
+    }
 }

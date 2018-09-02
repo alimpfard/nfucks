@@ -1,36 +1,29 @@
 namespace nFucks {
-    public struct TermCell
-    {
+    public struct TermCell {
         private char data;
         //public int metadata;
         public bool dirty;
         public ITermColor backgroundColor, foregroundColor;
-        private char[,] fillPattern;
-        public char[,] FillPattern
-        {
+        private char[, ] fillPattern;
+        public char[, ] FillPattern {
             get => fillPattern;
-            set
-            {
+            set {
                 if (fillPattern == value) return;
                 fillPattern = value;
                 dirty = true;
             }
         }
-        public char Data
-        {
+        public char Data {
             get => data;
-            set
-            {
+            set {
                 if (value == '\r' || value == '\n') value = ' ';
-                if (data != value)
-                {
+                if (data != value) {
                     data = value;
                     dirty = true;
                 }
             }
         }
-        public char UnsafeData
-        {
+        public char UnsafeData {
             get => data;
             set => data = value;
         }

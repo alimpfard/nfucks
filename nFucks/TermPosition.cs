@@ -4,6 +4,7 @@ namespace nFucks {
     public struct TermPosition {
         public int X, Y;
 
+        public static TermPosition Origin { get => new TermPosition (0, 0); }
         public TermPosition (int v1, int v2) : this () {
             X = v1;
             Y = v2;
@@ -99,7 +100,7 @@ namespace nFucks {
         }
         internal TermPosition CompoundMaxmimumBound (TermSize positionAddition) {
             return new TermPosition (Math.Max (X, X + positionAddition.X), Math.Max (Y, Y + positionAddition.Y));
-    }
+        }
         public void Set (int x, int y) {
             X = x;
             Y = y;
