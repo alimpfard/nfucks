@@ -83,7 +83,7 @@ namespace nFucksTest {
         public static void DrawYohane () {
             string path = System.AppDomain.CurrentDomain.BaseDirectory + "/yohane.color";
             var origin = TermPosition.Origin;
-            var surface0 = fucksManager.CreateAndInitializeSurface (origin, new TermResolution (resv.X, 160));
+            var surface0 = fucksManager.CreateAndInitializeSurface (origin, new TermResolution (36, 60));
             using (var sr = new System.IO.StreamReader (path))
             surface0.PutIRCColoredString (sr.ReadToEnd (), ref origin);
             fucksManager.renderOnce ();

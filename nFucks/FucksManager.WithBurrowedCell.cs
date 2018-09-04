@@ -2,7 +2,7 @@ using System;
 
 namespace nFucks {
     public partial class FucksManager {
-        public class WithBurrowedCell : IDisposable, IFucksSurface {
+        public class WithBurrowedCell : IDisposable {
             private TermCell[, ] Cells;
             private TermResolution Res, pRes;
             private TermPosition[] Addrs;

@@ -1,9 +1,8 @@
 using System;
 using static nFucks.FucksManager;
-using nFucks;
 
 namespace nFucks {
-    public partial class FucksSurfaceManager : IFucksSurface {
+    public partial class FucksSurfaceManager {
         readonly int MAX_HISTORY = 4;
         public TermState[] stepBacks;
         public TermState currentState;
@@ -462,7 +461,7 @@ namespace nFucks {
         /// <param name="notrans">if set to <c>true</c> will ignore transparency</param>
         /// <param name="force">force the cell to be rendered</param>
         /// <returns>whether the cell was rendered</returns>
-        private bool renderCell (ITermAPI Console, ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false, bool force = false) {
+        private bool renderCell (ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false, bool force = false) {
             cell.dirty = false;
             ITermColor back = cell.backgroundColor, fore = cell.foregroundColor;
             ConsoleColor? rf;
@@ -520,13 +519,13 @@ namespace nFucks {
         /// <param name="notrans">whether to ignore transparency</param>
         /// <param name="redraw">whether to redraw the cell without regards to anything</param>
         /// <returns>the status of the render</returns>
-        public RenderState RenderIfInBounds (ITermAPI Console, TermPosition position, bool force = false, bool notrans = false, bool redraw = false) {
+        public RenderState RenderIfInBounds (TermPosition position, bool force = false, bool notrans = false, bool redraw = false) {
             if (RaytraceLocal (ref position)) {
                 ref
                 var cell = ref currentState.cells[position.X, position.Y];
                 if (!(force || forced_dirty || cell.dirty || dirty_count > 0 || redraw)) return RenderState.Skipped;
                 dirty_count--;
-                if (!renderCell (Console, ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale, notrans, redraw))
+                if (!renderCell (ref cell, ref position, currentState.resolution.Xscale, currentState.resolution.Yscale, notrans, redraw))
                     return RenderState.IgnoreIfPossible; //it was a "hole" 
                 return RenderState.Rendered;
             }

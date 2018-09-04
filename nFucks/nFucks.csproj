@@ -52,7 +52,6 @@
     <Compile Include="GlobalTermInfo.cs" />
     <Compile Include="Natives.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="IFucksSurface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
