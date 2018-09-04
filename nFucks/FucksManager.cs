@@ -6,18 +6,26 @@ namespace nFucks {
         List<FucksSurfaceManager> surfaces = new List<FucksSurfaceManager> ();
         private bool invalidated = false;
         private bool dirty = false;
-        private GlobalTermInfo currentInfo = new GlobalTermInfo (TermSize.CurrentTermSize);
         private GlobalTermState[, ] renderState;
+        private ITermAPI termAPI;
+        private GlobalTermInfo currentInfo;
         private Natives natives = new Natives ();
 
         public FucksManager () {
-                natives.SetConsoleRaw ();
+            //natives.SetConsoleRaw ();
+            termAPI = new ConsoleTermAPI ();
+            currentInfo = new GlobalTermInfo (termAPI.GetSize ());
+            renderState = new GlobalTermState[currentInfo.size.X, currentInfo.size.Y];
+        }
+        public FucksManager (ITermAPI api) {
+                termAPI = api;
+                currentInfo = new GlobalTermInfo (termAPI.GetSize ());
                 renderState = new GlobalTermState[currentInfo.size.X, currentInfo.size.Y];
             }
 
             ~FucksManager () {
-                natives.RestoreConsoleMode ();
-                Console.ResetColor ();
+                // natives.RestoreConsoleMode ();
+                termAPI.ResetColor ();
             }
         /// <summary>
         /// Creates a surface without initializing it
@@ -50,7 +58,7 @@ namespace nFucks {
         /// </summary>
         /// <returns>The surface</returns>
         public FucksSurfaceManager CreateAndInitializeFullSurface () {
-            var sz = TermSize.CurrentTermSize;
+            var sz = termAPI.GetSize ();
             var manager = new FucksSurfaceManager (TermPosition.Origin, sz, BasicColor.Default);
             manager.Initialize ();
             surfaces.Add (manager);
@@ -130,9 +138,9 @@ namespace nFucks {
         /// </summary>
         /// <param name="opnorm">the position of the cell</param>
         private void ClearCell (TermPosition opnorm) {
-            Console.ResetColor ();
-            Console.SetCursorPosition (opnorm.Y, opnorm.X);
-            Console.Write (' ');
+            termAPI.ResetColor ();
+            termAPI.SetCursorPosition (opnorm.Y, opnorm.X);
+            termAPI.Write (' ');
         }
 
         /// <summary>
@@ -141,8 +149,8 @@ namespace nFucks {
         /// <param name="all">whether to redraw all surfaces</param>
         public void renderOnce (bool all = false) {
             dirty = dirty || surfaces.Any (x => x.Dirty);
-            Console.SetCursorPosition (0, 0);
-            TermSize sz = TermSize.CurrentTermSize;
+            termAPI.SetCursorPosition (0, 0);
+            TermSize sz = termAPI.GetSize ();
             if (sz != currentInfo.size) {
                 int Xscaled = sz.X / currentInfo.size.X;
                 int Yscaled = sz.Y / currentInfo.size.Y;
@@ -157,8 +165,8 @@ namespace nFucks {
                 invalidated = true;
             }
             if (invalidated) {
-                Console.ResetColor ();
-                Console.Clear ();
+                termAPI.ResetColor ();
+                termAPI.Clear ();
                 clearRenderState ();
                 // TODO clear translation artefacts
             }
@@ -174,12 +182,12 @@ namespace nFucks {
                         var sf = surfaces[i];
                         ref
                         var resolution = ref sf.currentState.resolution;
-                        var rst = sf.RenderIfInBounds (position, should_render, redraw : should_render);
+                        var rst = sf.RenderIfInBounds (termAPI, position, should_render, redraw : should_render);
                         if (rst != RenderState.NotInBounds) {
                             if (rst == RenderState.IgnoreIfPossible)
                                 if (i == surfaceCount - 1) {
                                     // ask it to render with a default background color
-                                    sf.RenderIfInBounds (position, all, true, should_render);
+                                    sf.RenderIfInBounds (termAPI, position, all, true, should_render);
                                 }
                             else continue;
                             for (int x = 0; x < resolution.Xscale; x++)
