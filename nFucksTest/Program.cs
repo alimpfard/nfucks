@@ -6,10 +6,34 @@ namespace nFucksTest {
         // get a manager
         static FucksManager fucksManager = new FucksManager ();
         public static void Main (string[] args) {
-            if (resv.Y >= 80) {
+			System.Console.ReadKey (true);
+			System.Net.IPEndPoint endPoint = new System.Net.IPEndPoint (0, 8086);
+			System.Net.Sockets.Socket socket = new System.Net.Sockets.Socket (System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.IP);
+			// get a surface at 8,10 with size of 10x40 real characters
+			var surfacernd = fucksManager.CreateAndInitializeSurface (TermPosition.Origin, new TermResolution (32, 64, 4, 8));
+			var pos0 = TermPosition.Origin;
+			socket.Bind (endPoint);
+			socket.Listen (6);
+			while (true) {
+				var sock = socket.Accept ();
+				byte[] board = new byte[64];
+				if (sock.Receive (board, 64, System.Net.Sockets.SocketFlags.None) != 64) 
+				{
+					sock.Close ();
+					continue;
+				}
+				for (int i = 0; i < 64; i++) {
+					char c = (char) board [i];
+					surfacernd.SetBackColor (pos0, c == 'X' ? BasicColor.Red : c == 'O' ? BasicColor.Blue : c == '.' ? BasicColor.Yellow : BasicColor.White);
+					surfacernd.PutChar ((char)i, pos0);
+					pos0.advanceRight (surfacernd.bounds);
+				}
+				fucksManager.renderOnce ();
+			}
+            /*if (resv.Y >= 80) {
                 DrawYohane ();
                 return;
-            }
+            }*/
             // get a surface at 8,10 with size of 10x40 real characters
             var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 40));
             // get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to ' '

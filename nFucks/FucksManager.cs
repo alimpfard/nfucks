@@ -192,8 +192,7 @@ namespace nFucks {
                             else continue;
                             for (int x = 0; x < resolution.Xscale; x++)
                                 for (int y = 0; y < resolution.Yscale; y++) {
-                                    ref
-                                    var rs = ref renderState[position.X + x, position.Y + y];
+                                    ref var rs = ref renderState[position.X + x, position.Y + y];
                                     rs.rendered = true;
                                     rs.dirty = false;
                                 }
