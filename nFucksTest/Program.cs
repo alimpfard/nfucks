@@ -11,7 +11,7 @@ namespace nFucksTest {
                 return;
             }
             // get a surface at 8,10 with size of 10x40 real characters
-            var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 40));
+            var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 80, 1, 2));
             // get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to ' '
             var surface1 = fucksManager.CreateAndInitializeSurface (
                 TermPosition.Origin,
@@ -24,20 +24,20 @@ namespace nFucksTest {
 
             // write "Hello, world" starting at 1,2 of the first surface
             var pos = new TermPosition (1, 2);
-            surface0.PutString ("Hello, World", ref pos);
+            //surface0.PutString ("Hello, World", ref pos);
             // make the 'd' background green
             surface0.SetBackColor (pos, BasicColor.Green);
 
             // put a '!' after the 'd'
             pos.advanceRight (surface0.bounds);
-            surface0.PutChar ('!', pos);
+            //surface0.PutChar ('!', pos);
 
             // put the string "hane" starting at 2,3 of the second surface
             pos.Set (2, 3);
             surface1.PutString ("hane", ref pos);
 
             // put a '*' where the 'e' would be if it were rendered in the first surface
-            surface0.PutChar ('*', ref pos);
+            //surface0.PutChar ('*', ref pos);
 
             // draw a frame for both windows
             surface0.drawBounds ();
@@ -52,7 +52,11 @@ namespace nFucksTest {
                 tempSurface.PutString ("Yohane", ref posv);
                 // the cells will be automatically merged back into the main surface when this block ends
             }
-
+            using (var tempSurface = surface0.burrowCells(false, Utils.GenerateArc(5, 10, 3, 0, 359)))
+            {
+                var posv = TermPosition.Origin;
+                tempSurface.PutString("  c i r   c l e h e l   l o !", ref posv);
+            }
             fucksManager.renderOnce ();
             while (true) {
                 // intercept a key from the terminal

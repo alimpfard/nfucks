@@ -1,11 +1,14 @@
 using System;
 
-namespace nFucks {
-    public struct TermPosition {
+namespace nFucks
+{
+    public struct TermPosition : IComparable<TermPosition>
+    {
         public int X, Y;
 
-        public static TermPosition Origin { get => new TermPosition (0, 0); }
-        public TermPosition (int v1, int v2) : this () {
+        public static TermPosition Origin { get => new TermPosition(0, 0); }
+        public TermPosition(int v1, int v2) : this()
+        {
             X = v1;
             Y = v2;
         }
@@ -14,9 +17,11 @@ namespace nFucks {
         /// wraps lines if necessary
         /// </summary>
         /// <param name="bounds">the bounds in which to move</param>
-        public void advanceRight (TermSize bounds) {
+        public void advanceRight(TermSize bounds)
+        {
             Y++;
-            if (Y >= bounds.Y) {
+            if (Y >= bounds.Y)
+            {
                 X++;
                 Y -= bounds.Y;
                 if (X >= bounds.X) X -= bounds.X;
@@ -27,9 +32,11 @@ namespace nFucks {
         /// wraps lines if necessary
         /// </summary>
         /// <param name="bounds">the bounds in which to move</param>
-        public void advanceDown (TermSize bounds) {
+        public void advanceDown(TermSize bounds)
+        {
             X++;
-            if (X >= bounds.X) {
+            if (X >= bounds.X)
+            {
                 Y++;
                 X -= bounds.X;
                 if (Y >= bounds.Y) Y -= bounds.Y;
@@ -40,9 +47,11 @@ namespace nFucks {
         /// wraps lines if necessary
         /// </summary>
         /// <param name="bounds">the bounds in which to move</param>
-        internal void advanceLeft (TermSize bounds) {
+        internal void advanceLeft(TermSize bounds)
+        {
             Y--;
-            if (Y < 0) {
+            if (Y < 0)
+            {
                 X--;
                 Y += bounds.Y;
                 if (X < 0) X += bounds.X;
@@ -53,9 +62,11 @@ namespace nFucks {
         /// wraps lines if necessary
         /// </summary>
         /// <param name="bounds">the bounds in which to move</param>
-        internal void advanceUp (TermSize bounds) {
+        internal void advanceUp(TermSize bounds)
+        {
             X--;
-            if (X < 0) {
+            if (X < 0)
+            {
                 Y--;
                 X += bounds.X;
                 if (Y < 0) Y += bounds.Y;
@@ -66,64 +77,96 @@ namespace nFucks {
         /// </summary>
         /// <param name="x">delta in X axis</param>
         /// <param name="y">delta in Y axis</param>
-        public void Translate (int x, int y) {
+        public void Translate(int x, int y)
+        {
             X += x;
             Y += y;
         }
         /// <summary>
         /// The absolute distance from origin
         /// </summary>
-        public int Size {
-            get {
-                return (int) (System.Math.Sqrt (System.Math.Pow (X, 2) + System.Math.Pow (Y, 2)) + 0.5); // Fix thou rounding errors
+        public int Size
+        {
+            get
+            {
+                return (int)(System.Math.Sqrt(System.Math.Pow(X, 2) + System.Math.Pow(Y, 2)) + 0.5); // Fix thou rounding errors
             }
         }
-        public override string ToString () {
-            return string.Format ("<{0}, {1}>", X, Y);
+        public override string ToString()
+        {
+            return string.Format("<{0}, {1}>", X, Y);
         }
 
-        internal void ScaledDown (int xscale, int yscale) {
+        internal void ScaledDown(int xscale, int yscale)
+        {
             xscale = xscale == 0 ? 1 : xscale;
             yscale = yscale == 0 ? 1 : yscale;
             X /= xscale;
             Y /= yscale;
         }
 
-        internal TermPosition CompoundMaxmimumBound (TermPosition positionDelta) {
-            return new TermPosition (Math.Min (X, X - positionDelta.X), Math.Min (Y, Y - positionDelta.Y));
+        internal TermPosition CompoundMaxmimumBound(TermPosition positionDelta)
+        {
+            return new TermPosition(Math.Min(X, X - positionDelta.X), Math.Min(Y, Y - positionDelta.Y));
         }
-        internal TermPosition CompoundMaxmimumBound (int x, int y) {
-            return new TermPosition (Math.Max (X, X + x), Math.Max (Y, Y + y));
+        internal TermPosition CompoundMaxmimumBound(int x, int y)
+        {
+            return new TermPosition(Math.Max(X, X + x), Math.Max(Y, Y + y));
         }
-        internal TermPosition CompoundMinimumBound (int x, int y) {
-            return new TermPosition (Math.Min (X, X + x), Math.Min (Y, Y + y));
+        internal TermPosition CompoundMinimumBound(int x, int y)
+        {
+            return new TermPosition(Math.Min(X, X + x), Math.Min(Y, Y + y));
         }
-        internal TermPosition CompoundMaxmimumBound (TermSize positionAddition) {
-            return new TermPosition (Math.Max (X, X + positionAddition.X), Math.Max (Y, Y + positionAddition.Y));
+        internal TermPosition CompoundMaxmimumBound(TermSize positionAddition)
+        {
+            return new TermPosition(Math.Max(X, X + positionAddition.X), Math.Max(Y, Y + positionAddition.Y));
         }
-        public void Set (int x, int y) {
+        public void Set(int x, int y)
+        {
             X = x;
             Y = y;
         }
-        public static TermPosition operator + (TermPosition p0, TermPosition p1) {
-            return new TermPosition (p0.X + p1.X, p0.Y + p1.Y);
+        public static TermPosition operator +(TermPosition p0, TermPosition p1)
+        {
+            return new TermPosition(p0.X + p1.X, p0.Y + p1.Y);
         }
-        public static TermPosition operator - (TermPosition p0, TermPosition p1) {
-            return new TermPosition (p0.X - p1.X, p0.Y - p1.Y);
+        public static TermPosition operator -(TermPosition p0, TermPosition p1)
+        {
+            return new TermPosition(p0.X - p1.X, p0.Y - p1.Y);
         }
-        public static TermPosition operator + (TermPosition p0, TermSize p1) {
-            return new TermPosition (p0.X + p1.X, p0.Y + p1.Y);
+        public static TermPosition operator +(TermPosition p0, TermSize p1)
+        {
+            return new TermPosition(p0.X + p1.X, p0.Y + p1.Y);
         }
-        public static TermPosition operator + (TermPosition p0, int p1) {
-            return new TermPosition (p0.X + p1, p0.Y + p1);
+        public static TermPosition operator +(TermPosition p0, int p1)
+        {
+            return new TermPosition(p0.X + p1, p0.Y + p1);
         }
-        public TermPosition ScaleUp (int xs, int ys) {
-            return new TermPosition (xs * X, ys * Y);
+        public TermPosition ScaleUp(int xs, int ys)
+        {
+            return new TermPosition(xs * X, ys * Y);
         }
-        public TermPosition ScaledUp (int xs, int ys) {
+        public TermPosition ScaledUp(int xs, int ys)
+        {
             X *= xs;
             Y *= ys;
             return this;
+        }
+        public int CompareTo(TermPosition z)
+        {
+            if (X < z.X)
+                return -1;
+            else if (X > z.X)
+                return 1;
+            else
+            {
+                if (Y < z.Y)
+                    return -1;
+                else if (Y > z.Y)
+                    return 1;
+                else
+                    return 0;
+            }
         }
     }
 }

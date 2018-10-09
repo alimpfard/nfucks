@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using static nFucks.FucksManager;
 
 namespace nFucks {
-    public partial class FucksSurfaceManager {
+    public partial class FucksSurfaceManager : IFucksSurface {
         readonly int MAX_HISTORY = 4;
         public TermState[] stepBacks;
         public TermState currentState;
@@ -125,7 +127,6 @@ namespace nFucks {
         public WithBurrowedCell burrowCells (bool new_pat, params TermPosition[] pos) {
             return new WithBurrowedCell (ref currentState.cells, ref currentState.resolution, pos, new_pat);
         }
-
         /// <summary>
         /// Ask for a redraw at next draw call
         /// </summary>

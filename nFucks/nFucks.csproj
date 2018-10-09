@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="FucksManager.WithBurrowedCell.cs" />
     <Compile Include="FucksSurfaceManager.cs" />
+    <Compile Include="IFucksSurface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TermState.cs" />
     <Compile Include="ITermAPI.cs" />

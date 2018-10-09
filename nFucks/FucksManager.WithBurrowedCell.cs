@@ -2,7 +2,7 @@ using System;
 
 namespace nFucks {
     public partial class FucksManager {
-        public class WithBurrowedCell : IDisposable {
+        public class WithBurrowedCell : IDisposable, IFucksSurface {
             private TermCell[, ] Cells;
             private TermResolution Res, pRes;
             private TermPosition[] Addrs;
@@ -136,6 +136,115 @@ namespace nFucks {
                 var cell = ref mCells[position.X, position.Y];
                 cell.foregroundColor = back;
                 cell.dirty = true;
+            }
+
+
+            public void PutIRCColoredString(string s, ref TermPosition pos)
+            {
+                int strlen = s.Length;
+                if (strlen == 0) return;
+                int str_idx = 0;
+                int c_x;
+                ITermColor
+                bac = null,
+                    fore = null;
+                for (c_x = pos.Y; pos.X < Res.Xres; pos.X++)
+                {
+                    for (; pos.Y < Res.Yres; pos.Y++)
+                    {
+                        if (str_idx == strlen) { pos.Y--; return; }
+                        char c = s[str_idx++];
+                        if (c == '\n')
+                        {
+                            pos.X--;
+                            break; // go to new line
+                        }
+                        if (c == '\x3')
+                        { // start/end sequence for IRC color
+                            int p_idx = str_idx;
+                            bool saw_f = false;
+                            char
+                            c0 = s[str_idx++],
+                                c1 = s[str_idx++];
+                            if (Char.IsNumber(c0))
+                            { // valid color
+                                if (Char.IsNumber(c1))
+                                {
+                                    // double-digit fore
+                                    fore = IRCColor.getITermColor(10 * (c0 - '0') + (c1 - '0'));
+                                    c1 = s[str_idx++]; // get next char
+                                    saw_f = true;
+                                }
+                                if (c1 == ',')
+                                { // single-digit fore, has bac
+                                    if (!saw_f)
+                                        fore = IRCColor.getITermColor(c0 - '0');
+                                    c = c1;
+                                    int tpos = str_idx;
+                                    c0 = s[str_idx++];
+                                    c1 = s[str_idx++];
+                                    if (Char.IsNumber(c0))
+                                    { // valid color
+                                        if (Char.IsNumber(c1))
+                                        { // two digit color
+                                            bac = IRCColor.getITermColor(10 * (c0 - '0') + (c1 - '0'));
+                                            c = s[str_idx++];
+                                        }
+                                        else
+                                        {
+                                            //single-digit color
+                                            bac = IRCColor.getITermColor(c0 - '0');
+                                            c = c1;
+                                        }
+                                    }
+                                    else
+                                    { // invalid color; assume comma is part of the string
+                                        c = c0;
+                                    }
+                                }
+                                else
+                                { // just a foreground
+                                    fore = IRCColor.getITermColor(c0 - '0');
+                                    c = c1;
+                                }
+                            }
+                            else
+                            { // reset color request
+                                fore = bac = null;
+                                c = c0;
+                            }
+                        }
+                        if (c == '\xf')
+                        { // plain
+                            bac = fore = null;
+                            c = s[str_idx++];
+                            pos.Y--;
+                            continue;
+                        }
+                        if (c == '\x2' || c == '\x1d' || c == '\x1f')
+                        { // bold, italic, underline: ignore
+                            pos.Y--;
+                            continue;
+                        }
+                        if (c == '\x16')
+                        { // reverse
+                            var tmp = bac;
+                            bac = fore;
+                            fore = tmp;
+                            pos.Y--;
+                            continue;
+                        }
+                        PutChar(c, pos);
+                        if (bac != null) SetBackColor(pos, bac);
+                        if (fore != null) SetForeColor(pos, fore);
+                    }
+                    if (str_idx == strlen)
+                    {
+                        pos.Y--;
+                        return;
+                    }
+                    pos.Y = c_x;
+                }
             }
         }
     }
