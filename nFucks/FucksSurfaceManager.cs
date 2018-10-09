@@ -464,25 +464,31 @@ namespace nFucks {
         private bool renderCell (ref TermCell cell, ref TermPosition position, int xs, int ys, bool notrans = false, bool force = false) {
             cell.dirty = false;
             ITermColor back = cell.backgroundColor, fore = cell.foregroundColor;
-            ConsoleColor? rf;
+            string rf, rb;
             if (back != null)
-                rf = back.AsConsoleColor ();
+                rb = back.AsANSIEscapeCode ();
             else
-                rf = defaultProvider.ProvideFallback (position);
-            if (rf == null && !notrans) return false;
-            Console.BackgroundColor = rf ?? Console.BackgroundColor; // don't touch it
+                rb = defaultProvider.ProvideFallback (position);
+            if (rb == null && !notrans) return false;
             if (fore != null)
-                rf = fore.AsConsoleColor ();
+                rf = fore.AsANSIEscapeCode();
             else
                 rf = defaultProvider.ProvideFallback (position, true);
-            char data = cell.Data;
+
             if (rf == null && notrans) return false;
+
+            char data = cell.Data;
             if (rf == null) data = (char) 0;
-            Console.ForegroundColor = rf ?? Console.ForegroundColor; // don't touch it
             TermPosition normalized = (position + surfacePosition).ScaledUp (xs, ys);
+            Console.SetCursorPosition(normalized.Y, normalized.X);
+            if (rb != null)
+                Console.Write(rb);
+            if (rf != null)
+                Console.Write(rf);
+
             for (int i = 0; i < xs; i++)
                 for (int j = 0; j < ys; j++) {
-                    Console.SetCursorPosition (normalized.Y + j, normalized.X + i);
+                    //Console.SetCursorPosition (normalized.Y + j, normalized.X + i);
                     char fill = cell.FillPattern[i, j];
                     if (fill == FillValue) fill = data;
                     Console.Write (fill);

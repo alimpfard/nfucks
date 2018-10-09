@@ -17,38 +17,38 @@ namespace nFucks {
     static class IRCColor {
         public static ITermColor getITermColor (int color) {
             switch (color) {
-                case 0:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.White);
                 case 1:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Black);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "0", "0" });
                 case 2:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkBlue);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "0", "127" });
                 case 3:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkGreen);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "147", "2" });
                 case 4:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Red);
+                    return new StaticSingleTermColorProvider (new string[] { "255", "0", "0" });
                 case 5:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkRed);
+                    return new StaticSingleTermColorProvider (new string[] { "127", "0", "0" });
                 case 6:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkMagenta);
+                    return new StaticSingleTermColorProvider (new string[] { "156", "0", "156" });
                 case 7:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkYellow);
+                    return new StaticSingleTermColorProvider (new string[] { "252", "127", "0" });
                 case 8:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Yellow);
+                    return new StaticSingleTermColorProvider (new string[] { "255", "255", "0" });
                 case 9:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Green);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "252", "0" });
                 case 10:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkCyan);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "147", "147" });
                 case 11:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Cyan);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "255", "255" });
                 case 12:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Blue);
+                    return new StaticSingleTermColorProvider (new string[] { "0", "0", "252" });
                 case 13:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Magenta);
+                    return new StaticSingleTermColorProvider (new string[] { "255", "0", "255" });
                 case 14:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.DarkGray);
+                    return new StaticSingleTermColorProvider (new string[] { "127", "127", "127" });
                 case 15:
-                    return new StaticSingleTermColorProvider (System.ConsoleColor.Gray);
+                    return new StaticSingleTermColorProvider (new string[] { "210", "210", "210" });
+                case 0:
+                    return new StaticSingleTermColorProvider (new string[] { "255", "255", "255" });
                 default:
                     return BasicColor.Default; // unknown color
             }

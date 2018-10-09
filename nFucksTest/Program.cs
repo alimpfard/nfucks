@@ -6,7 +6,7 @@ namespace nFucksTest {
         // get a manager
         static FucksManager fucksManager = new FucksManager ();
         public static void Main (string[] args) {
-            if (resv.Y >= 80) {
+            if (false && resv.Y >= 80) {
                 DrawYohane ();
                 return;
             }
@@ -18,8 +18,9 @@ namespace nFucksTest {
                 new TermResolution (10, 40, 1, 2),
                 new char[, ] { { ' ', FucksSurfaceManager.FillValue } }
             );
+            surface1.defaultProvider = new StaticTermColorProvider(new string[] { "122", "245", "43" }, new string[] { "12", "145", "143" });
             // set the default color scheme of the first surface (foreground is black, background is gray)
-            surface0.defaultProvider = new StaticTermColorProvider (System.ConsoleColor.Black, System.ConsoleColor.Gray);
+            surface0.defaultProvider = new StaticTermColorProvider (new string[] { "0" }, new string[] { "8" });
 
             // write "Hello, world" starting at 1,2 of the first surface
             var pos = new TermPosition (1, 2);
@@ -85,7 +86,7 @@ namespace nFucksTest {
             var origin = TermPosition.Origin;
             var surface0 = fucksManager.CreateAndInitializeSurface (origin, new TermResolution (36, 60));
             using (var sr = new System.IO.StreamReader (path))
-            surface0.PutIRCColoredString (sr.ReadToEnd (), ref origin);
+                surface0.PutIRCColoredString (sr.ReadToEnd (), ref origin);
             fucksManager.renderOnce ();
             System.Console.ReadKey ();
         }

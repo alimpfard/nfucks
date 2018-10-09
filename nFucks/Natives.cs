@@ -36,7 +36,7 @@ namespace nFucks {
                 uint mode;
                 if (GetConsoleMode (hOut, out mode)) {
                     ConsoleModePreRaw = mode;
-                    mode &= (uint) ~ConsoleModes.ENABLE_ECHO_INPUT;
+                    mode |= (uint)ConsoleModes.ENABLE_WINDOW_INPUT | (uint) ConsoleModes.ENABLE_ECHO_INPUT;
                     SetConsoleMode (hOut, mode);
                     return true;
                 }
