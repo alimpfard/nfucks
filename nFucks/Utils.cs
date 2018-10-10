@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace nFucks {
     static public class Utils {
+		const int shiftamt = 7;
         public static T[, ] ResizeArray<T> (ref T[, ] original, int rows, int cols) {
             var newArray = new T[rows, cols];
             int minRows = Math.Min (rows, original.GetLength (0));
@@ -15,9 +16,48 @@ namespace nFucks {
             return newArray;
         }
         static public Tuple<TermPosition, double> WrapTermPosition(int x, int y, double d) {
-		return Tuple.Create(new TermPosition(x, y), d);
+			return Tuple.Create(new TermPosition(x, y), d-shiftamt);
 	}
-        static public TermPosition[] GenerateArc(int x, int y, int rad, int start, int end, bool corners = false)
+		/// <summary>
+		/// Generates a circle mapped to a grid
+		/// </summary>
+		/// <returns>The circle's coordinates.</returns>
+		/// <param name="x">The x coordinate of the center pos.</param>
+		/// <param name="y">The y coordinate of the center pos.</param>
+		/// <param name="rad">Radius.</param>
+		/// <param name="clockwise_order">If set to <c>false</c> the output will be ordered counter-clockwise.</param>
+		static public TermPosition [] GenerateCircle (int x, int y, int rad, bool clockwise_order = true)
+		{
+			return GenerateArc (x, y, rad, 0, 359, clockwise_order);
+		}
+		/// <summary>
+		/// Generates a filled arc mapped to a grid
+		/// </summary>
+		/// <returns>The arc's coordinates.</returns>
+		/// <param name="x">The x coordinate of the arc's center.</param>
+		/// <param name="y">The y coordinate of the arc's center.</param>
+		/// <param name="rad">Outer radius.</param>
+		/// <param name="start">Start of the arc (in degrees).</param>
+		/// <param name="end">End of the arc (in degrees).</param>
+		/// <param name="clockwise_order">If set to <c>false</c> the output will be ordered counter-clockwise.</param>
+		static public TermPosition [] GenerateFilledArc (int x, int y, int rad, int start, int end, bool clockwise_order = true)
+		{
+			List<TermPosition> tp = new List<TermPosition> ();
+			for (int r = rad; r >= 0; r--)
+				tp.AddRange (GenerateArc (x, y, r, start, end, clockwise_order));
+			return tp.ToArray ();
+		}
+		/// <summary>
+		/// Generates an arc mapped to a grid
+		/// </summary>
+		/// <returns>The arc's coordinates.</returns>
+		/// <param name="x">The x coordinate of the arc's center.</param>
+		/// <param name="y">The y coordinate of the arc's center.</param>
+		/// <param name="rad">Radius.</param>
+		/// <param name="start">Start of the arc (in degrees).</param>
+		/// <param name="end">End of the arc (in degrees).</param>
+		/// <param name="clockwise_order">If set to <c>false</c> the output will be ordered counter-clockwise.</param>
+        static public TermPosition[] GenerateArc(int x, int y, int rad, int start, int end, bool clockwise_order = true)
         {
             double dstart, dend, temp;
             int stopval_start = 0, stopval_end = 0;
@@ -172,13 +212,13 @@ namespace nFucks {
                 ymcy = y - cy;
                 if (cx > 0)
                 {
-                    xpcx = x + cy;
-                    xmcx = x - cy;
+                    xpcx = x + cx;
+                    xmcx = x - cx;
                     // which octant?
                     if ((drawoct & 4) != 0) Cells.Add(WrapTermPosition(xmcx, ypcy, 2d));
                     if ((drawoct & 2) != 0) Cells.Add(WrapTermPosition(xpcx, ypcy, 1d));
-                    if ((drawoct & 32) != 0) Cells.Add(WrapTermPosition(xmcx, ymcy, 5d));
-                    if ((drawoct & 64) != 0) Cells.Add(WrapTermPosition(xpcx, ymcy, 6d));
+					if ((drawoct & 32) != 0) Cells.Add (WrapTermPosition (xmcx, ymcy, 5d));
+					  if ((drawoct & 64) != 0) Cells.Add(WrapTermPosition(xpcx, ymcy, 6d));
                 }
                 else
                 {
@@ -224,7 +264,7 @@ namespace nFucks {
                 {
                     df += d_e;
                     d_e += 2;
-                    d_se += 4;
+                    d_se += 2;
                 }
                 else
                 {
@@ -235,14 +275,20 @@ namespace nFucks {
                 }
                 cx++;
             } while (cx <= cy);
-            Cells.Sort((a, b) => {
-		if (a.Item2 == b.Item2) // same octant
-			return a.Item1.Y - b.Item1.Y;
-		return (int) (a.Item2 - b.Item2 * 10);
-	    });
-            return Cells.Select(a => a.Item1).ToArray<TermPosition>();
+			var center = new TermPosition (x, y);
+			Cells.Sort((a, b) => CircularCompare(a.Item1, b.Item1, center, clockwise_order));
+            return Cells.Select(a => a.Item1).ToArray();
         }
-
+		static public double toDegrees (double rad)
+		{
+			return rad * (180.0 / Math.PI);
+		}
+		static public int CircularCompare (TermPosition a, TermPosition b, TermPosition center, bool clock)
+		{
+			double a1 = (toDegrees (Math.Atan2 (a.X - center.X, a.Y - center.Y)) + 360) % 360;
+			double a2 = (toDegrees (Math.Atan2 (b.X - center.X, b.Y - center.Y)) + 360) % 360;
+			return (clock ? 1 : -1) * (int)(a1 - a2);
+		}
     }
 
     static class IRCColor {
