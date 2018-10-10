@@ -11,7 +11,7 @@ namespace nFucksTest {
                 return;
             }
             // get a surface at 8,10 with size of 10x40 real characters
-            var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 80, 1, 2));
+            var surface0 = fucksManager.CreateAndInitializeSurface (new TermPosition (8, 10), new TermResolution (10, 40));
             // get a surface at 0,0 with a scaled size (two real characters per Y cell) of 10x20 characters, and set the "skipped" cells to ' '
             var surface1 = fucksManager.CreateAndInitializeSurface (
                 TermPosition.Origin,
@@ -55,7 +55,7 @@ namespace nFucksTest {
             using (var tempSurface = surface0.burrowCells(false, Utils.GenerateArc(5, 10, 3, 0, 359)))
             {
                 var posv = TermPosition.Origin;
-                tempSurface.PutString("  c i r   c l e h e l   l o !", ref posv);
+                tempSurface.PutString("0123456789@#£%&-+=()", ref posv);
             }
             fucksManager.renderOnce ();
             while (true) {

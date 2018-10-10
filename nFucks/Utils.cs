@@ -14,8 +14,10 @@ namespace nFucks {
             original = newArray;
             return newArray;
         }
-
-        static public TermPosition[] GenerateArc(int x, int y, int rad, int start, int end)
+        static public Tuple<TermPosition, double> WrapTermPosition(int x, int y, double d) {
+		return Tuple.Create(new TermPosition(x, y), d);
+	}
+        static public TermPosition[] GenerateArc(int x, int y, int rad, int start, int end, bool corners = false)
         {
             double dstart, dend, temp;
             int stopval_start = 0, stopval_end = 0;
@@ -25,7 +27,7 @@ namespace nFucks {
                 d_se = -2 * rad + 5,
                 xpcx, xmcx, xpcy, xmcy,
                 ypcx, ymcx, ypcy, ymcy;
-            List<TermPosition> Cells = new List<TermPosition>();
+            var Cells = new List<Tuple<TermPosition, double>>();
 
             // Radius sanity check
             if (rad < 0)
@@ -173,15 +175,15 @@ namespace nFucks {
                     xpcx = x + cy;
                     xmcx = x - cy;
                     // which octant?
-                    if ((drawoct & 4) != 0) Cells.Add(new TermPosition(xmcx, ypcy));
-                    if ((drawoct & 2) != 0) Cells.Add(new TermPosition(xpcx, ypcy));
-                    if ((drawoct & 32) != 0) Cells.Add(new TermPosition(xmcx, ymcy));
-                    if ((drawoct & 64) != 0) Cells.Add(new TermPosition(xpcx, ymcy));
+                    if ((drawoct & 4) != 0) Cells.Add(WrapTermPosition(xmcx, ypcy, 2d));
+                    if ((drawoct & 2) != 0) Cells.Add(WrapTermPosition(xpcx, ypcy, 1d));
+                    if ((drawoct & 32) != 0) Cells.Add(WrapTermPosition(xmcx, ymcy, 5d));
+                    if ((drawoct & 64) != 0) Cells.Add(WrapTermPosition(xpcx, ymcy, 6d));
                 }
                 else
                 {
-                    if ((drawoct & 6) != 0) Cells.Add(new TermPosition(x, ypcy));
-                    if ((drawoct & 96) != 0) Cells.Add(new TermPosition(x, ymcy));
+                    if ((drawoct & 6) != 0) Cells.Add(WrapTermPosition(x, ypcy, 2.5d));
+                    if ((drawoct & 96) != 0) Cells.Add(WrapTermPosition(x, ymcy, 6.5d));
                 }
                 xpcy = x + cy;
                 xmcy = x - cy;
@@ -189,15 +191,15 @@ namespace nFucks {
                 {
                     ypcx = y + cx;
                     ymcx = y - cx;
-                    if ((drawoct & 8) != 0) Cells.Add(new TermPosition(xmcy, ypcx));
-                    if ((drawoct & 1) != 0) Cells.Add(new TermPosition(xpcy, ypcx));
-                    if ((drawoct & 16) != 0) Cells.Add(new TermPosition(xmcy, ymcx));
-                    if ((drawoct & 128) != 0) Cells.Add(new TermPosition(xpcy, ymcx));
+                    if ((drawoct & 8) != 0) Cells.Add(WrapTermPosition(xmcy, ypcx, 3d));
+                    if ((drawoct & 1) != 0) Cells.Add(WrapTermPosition(xpcy, ypcx, 0d));
+                    if ((drawoct & 16) != 0) Cells.Add(WrapTermPosition(xmcy, ymcx, 4d));
+                    if ((drawoct & 128) != 0) Cells.Add(WrapTermPosition(xpcy, ymcx, 7d));
                 }
                 else if (cx == 0)
                 {
-                    if ((drawoct & 24) != 0) Cells.Add(new TermPosition(xmcy, y));
-                    if ((drawoct & 2) != 0) Cells.Add(new TermPosition(xpcy, y));
+                    if ((drawoct & 24) != 0) Cells.Add(WrapTermPosition(xmcy, y, 4.5d));
+                    if ((drawoct & 2) != 0) Cells.Add(WrapTermPosition(xpcy, y, 1d));
                 }
 
                 // now update the octant mask
@@ -233,8 +235,12 @@ namespace nFucks {
                 }
                 cx++;
             } while (cx <= cy);
-            Cells.Sort();
-            return Cells.ToArray<TermPosition>();
+            Cells.Sort((a, b) => {
+		if (a.Item2 == b.Item2) // same octant
+			return a.Item1.Y - b.Item1.Y;
+		return (int) (a.Item2 - b.Item2 * 10);
+	    });
+            return Cells.Select(a => a.Item1).ToArray<TermPosition>();
         }
 
     }
