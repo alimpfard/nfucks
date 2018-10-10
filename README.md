@@ -8,4 +8,5 @@ Current optimization level: ~absolute crap~ ~tolerable~ ~almost fast enough~ dec
 + Multiple surface buffer management
 + Basic layouting system
 + Automatic Cell burrow-merge algorithm (cherry pick cells and write to them as if they were a uniform subsurface)
++ Circular/Arc subsurface selection for burrows
 + that's about it
